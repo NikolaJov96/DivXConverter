@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "DivXlogic/subtitleapp.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -15,8 +17,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+    void on_loadSubtitleButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    SubtitleApp SubtitleApp;
 };
 
 #endif // MAINWINDOW_H

@@ -24,8 +24,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    DivXlogic/subtitleapp.cpp \
+    DivXlogic/subtitles.cpp \
+    DivXlogic/subtitle.cpp \
+    DivXlogic/subtitleio.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    DivXlogic/subtitleapp.h \
+    DivXlogic/subtitles.h \
+    DivXlogic/subtitle.h \
+    DivXlogic/subtitleio.h
 
 FORMS    += mainwindow.ui
