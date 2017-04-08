@@ -28,7 +28,10 @@ SOURCES += main.cpp\
     DivXlogic/subtitleapp.cpp \
     DivXlogic/subtitles.cpp \
     DivXlogic/subtitle.cpp \
-    DivXlogic/subtitleio.cpp
+    DivXlogic/subtitleio.cpp \
+    DivXlogic/IO/srt.cpp \
+    DivXlogic/IO/microdvd.cpp \
+    DivXlogic/IO/mpsub.cpp
 
 HEADERS  += mainwindow.h \
     DivXlogic/subtitleapp.h \
