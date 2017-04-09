@@ -1,5 +1,7 @@
 #include "../subtitleio.h"
 
+MicroDVD::MicroDVD() {}
+
 void MicroDVD::loadTitle(Subtitles& subs, const QString&p) const
 {
     // load text file in MicroDVD format form path p

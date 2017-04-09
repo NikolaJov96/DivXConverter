@@ -1,5 +1,7 @@
 #include "../subtitleio.h"
 
+MPSub::MPSub() {}
+
 void MPSub::loadTitle(Subtitles& subs, const QString&p) const
 {
     // load text file in MPSub format form path p

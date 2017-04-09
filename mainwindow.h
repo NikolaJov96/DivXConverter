@@ -24,6 +24,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     SubtitleApp SubtitleApp;
+
+    int discardChangesDialog() const;
 };
 
 #endif // MAINWINDOW_H
