@@ -23,9 +23,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    SubtitleApp SubtitleApp;
+    SubtitleApp subtitleApp;
 
     int discardChangesDialog() const;
+    void refreshTitleList();
 };
 
 #endif // MAINWINDOW_H

@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegExp>
+#include <QDebug>
 
 SRT::SRT() {}
 
@@ -10,13 +11,14 @@ long SRT::timeToLong(const QString &time) const
 {
     // convert string time to ms - format: 01:03:00,900
     QRegExp rx("([0-9]+)");
-    int pos = 0;
-    while ((pos = rx.indexIn(time, pos)) != -1);
-    if (rx.captureCount() != 4) { /* throw invalid time */ }
-    return ((rx.cap(3).toLong() * 60 +
-             rx.cap(2).toLong()) * 60 +
-            rx.cap(1).toLong()) * 1000 +
-            rx.cap(0).toLong();
+    long arr[4];
+    int pos = 0, ind = 0;
+    while ((pos = rx.indexIn(time, pos)) != -1) {
+        arr[ind++] = rx.cap(1).toLong();
+        pos += rx.matchedLength();
+    }
+    if (ind != 4) { qInfo() << "Invalid time!\n" << time << "\n"; /* throw invalid time */ }
+    return ((arr[0] * 60 + arr[1]) * 60 + arr[2]) * 1000 + arr[3];
 }
 
 QString SRT::longToTime(long ms) const
@@ -34,9 +36,11 @@ void SRT::loadTitle(Subtitles &subs, const QString &p) const
     // parse it and store to subs
 
     QFile inFile(p);
-    if (!inFile.isOpen())
+    if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         // throw unable to open file
+        qInfo() << "Unable to open file!\n" << p << "\n";
+        return;
     }
     QTextStream inStream(&inFile);
     QString time, data, nextLine;
@@ -48,12 +52,12 @@ void SRT::loadTitle(Subtitles &subs, const QString &p) const
         while (!inStream.atEnd() &&
                (time = inStream.readLine()).length() == 0);
         if (inStream.atEnd() && time.length() > 0)
-        { /* throw invalid file */ }
+        { qInfo() << "Invalid file!\n"; /* throw invalid file */ }
 
         // read and convert start and end time
         time = inStream.readLine();
         long start = timeToLong(time.mid(0, 12));
-        long end  = timeToLong(time.mid(17));
+        long end = timeToLong(time.mid(17));
 
         // read title text
         data = "";

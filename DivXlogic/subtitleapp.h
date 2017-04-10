@@ -9,6 +9,8 @@ class SubtitleApp
 public:
     SubtitleApp();
 
+    Subtitles &getSubtitles();
+
     bool isLoaded() const;
 
     void loadTitle(const QString&, FORMATS);

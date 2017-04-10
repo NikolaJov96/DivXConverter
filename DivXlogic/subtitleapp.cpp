@@ -2,6 +2,8 @@
 
 SubtitleApp::SubtitleApp() {}
 
+Subtitles &SubtitleApp::getSubtitles() { return subtitles; }
+
 bool SubtitleApp::isLoaded() const
 {
     return !(subtitles.isEmpty() || !IOmanager);
@@ -9,6 +11,8 @@ bool SubtitleApp::isLoaded() const
 
 void SubtitleApp::loadTitle(const QString &path, FORMATS format)
 {
+    for (auto row : subtitles.getTitles()) delete row;
+    subtitles.getTitles().clear();
     switch (format) {
     case FORMATS::SRT:
         IOmanager = &SRTManager; break;

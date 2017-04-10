@@ -10,12 +10,16 @@ public:
 
     QString &getText();
     long &getStart();
+    QString getSStart() const;
     long &getEnd();
+    QString getSEnd() const;
 
 private:
     QString text;
     // absolute start and end time in ms
     long start, end;
+
+    QString longToTime(long) const;
 };
 
 #endif // SUBTITLE_H
