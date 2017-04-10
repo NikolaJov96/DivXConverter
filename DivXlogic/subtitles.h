@@ -15,6 +15,7 @@ public:
 
     int getFPS() const;
     vector<Subtitle*> &getTitles();
+    vector<Subtitle*> const &getTitles() const;
     void setFPS(int);
 
     long subtitleCo() const;

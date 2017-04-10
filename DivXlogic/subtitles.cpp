@@ -10,6 +10,11 @@ long Subtitles::subtitleCo() const { return subtitles.size(); }
 
 vector<Subtitle*> &Subtitles::getTitles() { return subtitles; }
 
+vector<Subtitle*> const &Subtitles::getTitles() const
+{
+    return subtitles;
+}
+
 void Subtitles::setFPS(int f) { FPS = f; }
 
 bool Subtitles::isEmpty() const { return subtitles.size() == 0; }

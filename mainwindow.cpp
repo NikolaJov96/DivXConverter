@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setUI(false);
 }
 
 MainWindow::~MainWindow()
@@ -74,7 +75,51 @@ void MainWindow::on_loadSubtitleButton_clicked()
     QString path = QFileDialog::getOpenFileName(
                 this, "Open file", "",
                 "Titles (*.srt *.sub *.txt);;All Files(*)");
+    if (path.length() == 0) return;
     FORMATS format = SubtitleIO::detect(path);
-    subtitleApp.loadTitle(path, format);
+    ui->loadSubtitleButton->setText("...");
+    try {
+        setUI(false);
+        subtitleApp.loadTitle(path, format);
+        setUI(true);
+    } catch (...) {}
+    ui->loadSubtitleButton->setText("Load Subtitle");
+    ui->FPSSpinBox->setValue(DEFAULT_FPS);
+    ui->FPSlabel->setText("Current FPS:");
     refreshTitleList();
+}
+
+void MainWindow::on_saveSubtitleButton_clicked()
+{
+    QString path = QFileDialog::getSaveFileName(
+                this, "Save file", "",
+                "Titles (*.srt *.sub *.txt);;All Files(*)");
+    if (path.length() == 0) return;
+    FORMATS format;
+    if (ui->SRTRadioButton->isChecked()) format = FORMATS::SRT;
+    else if (ui->MPSubRadioButton->isChecked()) format = FORMATS::MPSub;
+    else if (ui->MicroDVDRadioButton->isChecked()) format = FORMATS::MicroDVD;
+    else { /* throw wrong format */ }
+    ui->saveSubtitleButton->setText("...");
+    subtitleApp.saveTitle(path, format);
+    ui->saveSubtitleButton->setText("Save Subtitle");
+}
+
+void MainWindow::setUI(bool state)
+{
+    ui->saveSubtitleButton->setEnabled(state);
+    ui->saveTypeGroupBox->setEnabled(state);
+    ui->FPSSpinBox->setEnabled(state);
+}
+
+void MainWindow::on_FPSSpinBox_valueChanged(int arg1)
+{
+    ui->FPSlabel->setText("Current FPS:*");
+}
+
+void MainWindow::on_FPSSpinBox_editingFinished()
+{
+    ui->FPSlabel->setText("Current FPS:");
+    subtitleApp.getSubtitles().setFPS(
+                ui->FPSSpinBox->value());
 }

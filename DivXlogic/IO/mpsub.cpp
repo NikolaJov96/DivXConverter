@@ -8,7 +8,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString&p) const
     // parse it and store to subs
 }
 
-void MPSub::saveTitle(Subtitles& subs, const QString&p) const
+void MPSub::saveTitle(const Subtitles& subs, const QString&p) const
 {
     // convert titles from subs to MPSub format
     // save it to file with path p
