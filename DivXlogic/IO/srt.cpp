@@ -30,7 +30,7 @@ QString SRT::longToTime(long ms) const
             QString("%1").arg(ms % 1000, 3, 10, QChar('0'));
 }
 
-void SRT::loadTitle(Subtitles &subs, const QString &p) const
+void SRT::loadTitle(Subtitles &subs, const QString &p, double fps) const
 {
     // load text file in SRT format form path p
     // parse it and store to subs
@@ -42,6 +42,7 @@ void SRT::loadTitle(Subtitles &subs, const QString &p) const
         qInfo() << "Unable to open file!\n" << p << "\n";
         return;
     }
+    subs.setFPS(fps);
     QTextStream inStream(&inFile);
     QString time, data, nextLine;
     while (!inStream.atEnd())

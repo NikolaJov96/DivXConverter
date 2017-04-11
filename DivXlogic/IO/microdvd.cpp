@@ -9,11 +9,10 @@
 
 MicroDVD::MicroDVD() {}
 
-void MicroDVD::loadTitle(Subtitles& subs, const QString &path) const
+void MicroDVD::loadTitle(Subtitles& subs, const QString &path, double fps) const
 {
     // load text file in MicroDVD format form path p
     // parse it and store to subs
-    // assume that subs::FPS is preset
 
     QFile inFile(path);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -22,6 +21,7 @@ void MicroDVD::loadTitle(Subtitles& subs, const QString &path) const
         qInfo() << "Unable to open file!\n" << path << "\n";
         return;
     }
+    subs.setFPS(fps);
     QTextStream inStream(&inFile);
     QString row;
     QStringList list;

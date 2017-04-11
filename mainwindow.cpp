@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setUI(false);
-    ui->loadSubtitleButton->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +41,7 @@ void MainWindow::refreshTitleList()
         {"Start", "End", "Subtitle text"};
     model->setHorizontalHeaderLabels(horizontalLabels);
 
-    // save positions
+    // save vertical scrool positions
     long ind = 0;
     for (Subtitle* &row : subtitleApp.getSubtitles().getTitles())
     {
@@ -58,7 +57,7 @@ void MainWindow::refreshTitleList()
     ui->tableView->setColumnWidth(1, 75);
     ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    // restore position
+    // restore vertical scrool position
 }
 
 void MainWindow::on_loadSubtitleButton_clicked()
@@ -67,8 +66,7 @@ void MainWindow::on_loadSubtitleButton_clicked()
     {
         switch (discardChangesDialog()) {
         case QMessageBox::Save:
-            break;
-        case QMessageBox::Discard:
+            on_saveSubtitleButton_clicked();
             break;
         case QMessageBox::Cancel: return; break;
         }
@@ -78,52 +76,92 @@ void MainWindow::on_loadSubtitleButton_clicked()
                 "Titles (*.srt *.sub *.txt);;All Files(*)");
     if (path.length() == 0) return;
     FORMATS format = SubtitleIO::detect(path);
-    subtitleApp.getSubtitles().setFPS(DEFAULT_FPS);
-    // Preset FPS specialy if opening MicroDVD
-    // if (format == FORMATS::MicroDVD)
     ui->loadSubtitleButton->setText("...");
     try {
         setUI(false);
-        subtitleApp.loadTitle(path, format);
+        subtitleApp.loadTitle(path, format, ui->iFPSDoubleSpinBox->value());
         setUI(true);
     } catch (...) {}
+    updateWindowTitle();
     ui->loadSubtitleButton->setText("Load Subtitle");
-    ui->FPSSpinBox->setValue(subtitleApp.getSubtitles().getFPS());
+    ui->FPSDoubleSpinBox->setValue(subtitleApp.getSubtitles().getFPS());
     ui->FPSlabel->setText("Current FPS:");
     refreshTitleList();
 }
 
 void MainWindow::on_saveSubtitleButton_clicked()
 {
+    ui->saveSubtitleButton->setText("...");
+    try
+    {
+        subtitleApp.saveTitle();
+    }
+    catch (...) { /* show message - umable to save */ }
+    ui->saveSubtitleButton->setText("Save Subtitle");
+}
+
+void MainWindow::on_saveSubtitleAsButton_clicked()
+{
+    // Get saving format
+    FORMATS format;
+    QString exts = "";
+    if (ui->SRTRadioButton->isChecked())
+    {
+        format = FORMATS::SRT;
+        exts = "*.srt";
+    }
+    else if (ui->MPSubRadioButton->isChecked())
+    {
+        format = FORMATS::MPSub;
+        exts = "*.sub";
+    }
+    else if (ui->MicroDVDRadioButton->isChecked())
+    {
+        format = FORMATS::MicroDVD;
+        exts = "*.sub *.txt";
+    }
+    else { return; /* throw wrong format */ }
+
     QString path = QFileDialog::getSaveFileName(
                 this, "Save file", "",
-                "Titles (*.srt *.sub *.txt);;All Files(*)");
+                "Titles (" + exts + ");;All Files(*)");
+
     if (path.length() == 0) return;
-    FORMATS format;
-    if (ui->SRTRadioButton->isChecked()) format = FORMATS::SRT;
-    else if (ui->MPSubRadioButton->isChecked()) format = FORMATS::MPSub;
-    else if (ui->MicroDVDRadioButton->isChecked()) format = FORMATS::MicroDVD;
-    else { /* throw wrong format */ }
-    ui->saveSubtitleButton->setText("...");
-    subtitleApp.saveTitle(path, format);
-    ui->saveSubtitleButton->setText("Save Subtitle");
+    ui->saveSubtitleAsButton->setText("...");
+    try
+    {
+        subtitleApp.saveTitle(path, format);
+    }
+    catch (...) { setUI(false); }
+    updateWindowTitle();
+    ui->saveSubtitleAsButton->setText("Save Subtitle As");
 }
 
 void MainWindow::setUI(bool state)
 {
     ui->saveSubtitleButton->setEnabled(state);
+    ui->saveSubtitleAsButton->setEnabled(state);
     ui->saveTypeGroupBox->setEnabled(state);
-    ui->FPSSpinBox->setEnabled(state);
+    ui->FPSDoubleSpinBox->setEnabled(state);
 }
 
-void MainWindow::on_FPSSpinBox_valueChanged(int arg1)
+void MainWindow::updateWindowTitle()
+{
+    if (subtitleApp.isLoaded())
+        this->setWindowTitle(PROGRAM_TITLE + " | " +
+                             subtitleApp.getFilePath());
+    else
+        this->setWindowTitle(PROGRAM_TITLE);
+}
+
+void MainWindow::on_FPSDoubleSpinBox_valueChanged(double arg1)
 {
     ui->FPSlabel->setText("Current FPS:*");
 }
 
-void MainWindow::on_FPSSpinBox_editingFinished()
+void MainWindow::on_FPSDoubleSpinBox_editingFinished()
 {
     ui->FPSlabel->setText("Current FPS:");
     subtitleApp.getSubtitles().setFPS(
-                ui->FPSSpinBox->value());
+                ui->FPSDoubleSpinBox->value());
 }

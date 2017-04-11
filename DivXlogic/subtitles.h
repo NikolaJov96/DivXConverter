@@ -13,17 +13,17 @@ public:
     Subtitles();
     Subtitles(int);
 
-    int getFPS() const;
+    double getFPS() const;
     vector<Subtitle*> &getTitles();
     vector<Subtitle*> const &getTitles() const;
-    void setFPS(int);
+    void setFPS(double);
 
     long subtitleCo() const;
     bool isEmpty() const;
     void addSubTitle(Subtitle*, long t = -1);
 private:
     vector<Subtitle*> subtitles;
-    int FPS = 25;
+    double FPS = 25.0;
 };
 
 #endif // SUBTITLES_H

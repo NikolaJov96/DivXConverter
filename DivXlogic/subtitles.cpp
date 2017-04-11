@@ -4,7 +4,7 @@ Subtitles::Subtitles() {}
 
 Subtitles::Subtitles(int f) : FPS(f) {}
 
-int Subtitles::getFPS() const { return FPS; }
+double Subtitles::getFPS() const { return FPS; }
 
 long Subtitles::subtitleCo() const { return subtitles.size(); }
 
@@ -15,13 +15,13 @@ vector<Subtitle*> const &Subtitles::getTitles() const
     return subtitles;
 }
 
-void Subtitles::setFPS(int f) { FPS = f; }
+void Subtitles::setFPS(double fps) { FPS = fps; }
 
 bool Subtitles::isEmpty() const { return subtitles.size() == 0; }
 
-void Subtitles::addSubTitle(Subtitle *s, long t)
+void Subtitles::addSubTitle(Subtitle *sub, long t)
 {
-    if (t == -1) subtitles.push_back(s);
+    if (t == -1) subtitles.push_back(sub);
     else
     {
         // find a place to insert

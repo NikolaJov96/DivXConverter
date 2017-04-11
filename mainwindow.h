@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+const QString PROGRAM_TITLE = "DivX Converter";
+
 #include "DivXlogic/subtitleapp.h"
 
 namespace Ui {
@@ -23,9 +25,11 @@ private slots:
 
     void on_saveSubtitleButton_clicked();
 
-    void on_FPSSpinBox_valueChanged(int arg1);
+    void on_saveSubtitleAsButton_clicked();
 
-    void on_FPSSpinBox_editingFinished();
+    void on_FPSDoubleSpinBox_valueChanged(double arg1);
+
+    void on_FPSDoubleSpinBox_editingFinished();
 
 private:
     Ui::MainWindow *ui;
@@ -34,6 +38,7 @@ private:
     int discardChangesDialog() const;
     void refreshTitleList();
     void setUI(bool);
+    void updateWindowTitle();
 };
 
 #endif // MAINWINDOW_H

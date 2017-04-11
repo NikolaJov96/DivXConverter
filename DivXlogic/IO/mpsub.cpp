@@ -6,7 +6,7 @@
 
 MPSub::MPSub() {}
 
-void MPSub::loadTitle(Subtitles& subs, const QString&p) const
+void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
 {
     // load text file in MPSub format form path p
     // parse it and store to subs
@@ -18,6 +18,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString&p) const
         qInfo() << "Unable to open file!\n" << p << "\n";
         return;
     }
+    subs.setFPS(fps);
     QTextStream inStream(&inFile);
     QString time, data, nextLine;
     double timePoint = 0;
