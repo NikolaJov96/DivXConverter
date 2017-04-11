@@ -75,17 +75,17 @@ void SRT::loadTitle(Subtitles &subs, const QString &p) const
     inFile.close();
 }
 
-void SRT::saveTitle(const Subtitles& subs, const QString&p) const
+void SRT::saveTitle(const Subtitles& subs, const QString &path) const
 {
     // convert titles from subs to SRT format
     // save it to file with path p
 
-    QFile outFile(p);
+    QFile outFile(path);
     if (!outFile.open(QIODevice::WriteOnly))
     {
-        qInfo() << "Unable to open file!\n" << p << "\n";
+        qInfo() << "Unable to open file!\n" << path << "\n";
         return;
-        // throw unable to open file
+        // throw unable to save file
     }
     QTextStream outStream(&outFile);
     int ID = 0;

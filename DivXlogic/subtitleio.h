@@ -32,9 +32,6 @@ public:
     MicroDVD();
     void loadTitle(Subtitles&, const QString&) const;
     void saveTitle(const Subtitles&, const QString&) const;
-private:
-    long timeToLong(const QString&) const;
-    QString longToTime(long) const;
 };
 
 class MPSub : public SubtitleIO
@@ -44,9 +41,6 @@ public:
     MPSub();
     void loadTitle(Subtitles&, const QString&) const;
     void saveTitle(const Subtitles&, const QString&) const;
-private:
-    long timeToLong(const QString&) const;
-    QString longToTime(long) const;
 };
 
 #endif // SUBTITLEIO_H

@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setUI(false);
+    ui->loadSubtitleButton->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +78,9 @@ void MainWindow::on_loadSubtitleButton_clicked()
                 "Titles (*.srt *.sub *.txt);;All Files(*)");
     if (path.length() == 0) return;
     FORMATS format = SubtitleIO::detect(path);
+    subtitleApp.getSubtitles().setFPS(DEFAULT_FPS);
+    // Preset FPS specialy if opening MicroDVD
+    // if (format == FORMATS::MicroDVD)
     ui->loadSubtitleButton->setText("...");
     try {
         setUI(false);
@@ -84,7 +88,7 @@ void MainWindow::on_loadSubtitleButton_clicked()
         setUI(true);
     } catch (...) {}
     ui->loadSubtitleButton->setText("Load Subtitle");
-    ui->FPSSpinBox->setValue(DEFAULT_FPS);
+    ui->FPSSpinBox->setValue(subtitleApp.getSubtitles().getFPS());
     ui->FPSlabel->setText("Current FPS:");
     refreshTitleList();
 }
