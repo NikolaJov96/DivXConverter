@@ -5,25 +5,25 @@
 
 #include "subtitle.h"
 
-using namespace std;
-
+/*!
+ * \brief The Subtitles class
+ *
+ * Class container for Subtitle instances
+ */
 class Subtitles
 {
 public:
-    Subtitles();
-    Subtitles(int);
+    double getFPS() const;                              /*!< Return current FPS setting */
+    std::vector<Subtitle*> &getTitles();                /*!< Return reference to Subtitle* vector */
+    std::vector<Subtitle*> const &getTitles() const;    /*!< Return const reference to Subtitle* vector */
+    void setFPS(double);                                /*!< FPS setter */
 
-    double getFPS() const;
-    vector<Subtitle*> &getTitles();
-    vector<Subtitle*> const &getTitles() const;
-    void setFPS(double);
-
-    long subtitleCo() const;
-    bool isEmpty() const;
-    void addSubTitle(Subtitle*, long t = -1);
+    long subtitleCo() const;                            /*!< Returns number of subtitles in container */
+    bool isEmpty() const;                               /*!< Checks if container is empty */
+    void addSubTitle(Subtitle*, long t = -1);           /*!< Inserts new subtitle (to the end by default)*/
 private:
-    vector<Subtitle*> subtitles;
-    double FPS = 25.0;
+    std::vector<Subtitle*> subtitles;                   /*!< Vector of individual subtitles */
+    double FPS = 25.0;                                  /*!< Current FPS setting */
 };
 
 #endif // SUBTITLES_H

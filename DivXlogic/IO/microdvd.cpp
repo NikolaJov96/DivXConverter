@@ -7,8 +7,6 @@
 #include <QStringList>
 #include <QString>
 
-MicroDVD::MicroDVD() {}
-
 void MicroDVD::loadTitle(Subtitles& subs, const QString &path, double fps) const
 {
     // load text file in MicroDVD format form path p

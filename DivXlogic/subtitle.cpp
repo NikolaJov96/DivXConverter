@@ -5,14 +5,20 @@ Subtitle::Subtitle(const QString &t, long s, long e) :
 
 QString &Subtitle::getText() { return text; }
 
+QString const &Subtitle::getText() const { return text; }
+
 long &Subtitle::getStart() { return start; }
+
+long &Subtitle::getEnd() { return end; }
+
+long Subtitle::getStart() const { return start; }
+
+long Subtitle::getEnd() const { return end; }
 
 QString Subtitle::getSStart() const
 {
     return longToTime(start);
 }
-
-long &Subtitle::getEnd() { return end; }
 
 QString Subtitle::getSEnd() const
 {

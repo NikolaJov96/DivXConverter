@@ -4,8 +4,6 @@
 #include <QDebug>
 #include <QFile>
 
-MPSub::MPSub() {}
-
 void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
 {
     // load text file in MPSub format form path p

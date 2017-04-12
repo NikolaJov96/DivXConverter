@@ -1,11 +1,15 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <QDebug>
+#include <QModelIndexList>
+#include <algorithm>
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "DivXlogic/subtitleio.h"
+#include "edittitledialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,7 +29,8 @@ int MainWindow::discardChangesDialog() const
     QMessageBox msgBox;
     msgBox.setText("There is a subtitle loaded.");
     msgBox.setInformativeText("Do you want to save the current state?");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setStandardButtons(QMessageBox::Save |
+                              QMessageBox::Discard | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     return msgBox.exec();
 }
@@ -33,40 +38,45 @@ int MainWindow::discardChangesDialog() const
 void MainWindow::refreshTitleList()
 {
     // reset table with subtitles
-    long rows = subtitleApp.getSubtitles().subtitleCo();
     delete ui->tableView->model();
     QStandardItemModel *model =
-            new QStandardItemModel(rows, 3);
+            new QStandardItemModel(0, 3);
     QStringList horizontalLabels =
         {"Start", "End", "Subtitle text"};
     model->setHorizontalHeaderLabels(horizontalLabels);
 
-    // save vertical scrool positions
     long ind = 0;
+    QList<QStandardItem*> list;
     for (Subtitle* &row : subtitleApp.getSubtitles().getTitles())
     {
         // add title to table
-        model->setItem(ind, 0, new QStandardItem(row->getSStart()));
-        model->setItem(ind, 1, new QStandardItem(row->getSEnd()));
-        model->setItem(ind, 2, new QStandardItem(row->getText()));
+        if (searchPhrase.length() > 0 &&
+                !row->getText().contains(searchPhrase)) continue;
+        list.clear();
+        list.append(new QStandardItem(row->getSStart()));
+        list.append(new QStandardItem(row->getSEnd()));
+        list.append(new QStandardItem(row->getText()));
+        model->appendRow(list);
         ind++;
     }
     ui->tableView->setModel(model);
-    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->verticalHeader()->
+            setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->setColumnWidth(0, 75);
     ui->tableView->setColumnWidth(1, 75);
     ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    // restore vertical scrool position
+    ui->tableView->horizontalHeader()->
+            setSectionResizeMode(QHeaderView::Fixed);
 }
 
-void MainWindow::on_loadSubtitleButton_clicked()
+void MainWindow::actionLoad()
 {
     if (subtitleApp.isLoaded())
     {
         switch (discardChangesDialog()) {
         case QMessageBox::Save:
-            on_saveSubtitleButton_clicked();
+            if (subtitleApp.getFilePath().length() > 0) actionSave();
+            else actionSaveAs();
             break;
         case QMessageBox::Cancel: return; break;
         }
@@ -79,8 +89,10 @@ void MainWindow::on_loadSubtitleButton_clicked()
     ui->loadSubtitleButton->setText("...");
     try {
         setUI(false);
-        subtitleApp.loadTitle(path, format, ui->iFPSDoubleSpinBox->value());
+        subtitleApp.loadTitle(path, format,
+                              ui->iFPSDoubleSpinBox->value());
         setUI(true);
+        ui->editButton->setEnabled(true);
     } catch (...) {}
     updateWindowTitle();
     ui->loadSubtitleButton->setText("Load Subtitle");
@@ -89,7 +101,7 @@ void MainWindow::on_loadSubtitleButton_clicked()
     refreshTitleList();
 }
 
-void MainWindow::on_saveSubtitleButton_clicked()
+void MainWindow::actionSave()
 {
     ui->saveSubtitleButton->setText("...");
     try
@@ -100,7 +112,7 @@ void MainWindow::on_saveSubtitleButton_clicked()
     ui->saveSubtitleButton->setText("Save Subtitle");
 }
 
-void MainWindow::on_saveSubtitleAsButton_clicked()
+void MainWindow::actionSaveAs()
 {
     // Get saving format
     FORMATS format;
@@ -137,12 +149,47 @@ void MainWindow::on_saveSubtitleAsButton_clicked()
     ui->saveSubtitleAsButton->setText("Save Subtitle As");
 }
 
+void MainWindow::actionEdit()
+{
+    QModelIndexList indexes =
+            ui->tableView->selectionModel()->
+            selection().indexes();
+    if (indexes.count() != 3)
+    {
+        /*  */
+        return;
+    }
+    QString data = ui->tableView->model()->
+            data(ui->tableView->model()->
+                 index(indexes.at(0).row(), 0)).toString();
+    long row = 0;
+    for (auto it = subtitleApp.getSubtitles().getTitles().begin();
+         it != subtitleApp.getSubtitles().getTitles().end(); it++)
+    {
+        if ((*it)->getSStart() == data) break;
+        row++;
+    }
+
+    editTitleDialog dialog(
+                subtitleApp.getSubtitles().getTitles()[row],
+                this);
+    dialog.setModal(true);
+    dialog.exec();
+    std::sort(subtitleApp.getSubtitles().getTitles().begin(),
+              subtitleApp.getSubtitles().getTitles().end(),
+              [](const Subtitle *a, const Subtitle *b) -> bool {
+        return a->getStart() < b->getStart();
+    });
+    refreshTitleList();
+}
+
 void MainWindow::setUI(bool state)
 {
     ui->saveSubtitleButton->setEnabled(state);
     ui->saveSubtitleAsButton->setEnabled(state);
     ui->saveTypeGroupBox->setEnabled(state);
     ui->FPSDoubleSpinBox->setEnabled(state);
+    ui->editButton->setEnabled(state);
 }
 
 void MainWindow::updateWindowTitle()
@@ -154,7 +201,22 @@ void MainWindow::updateWindowTitle()
         this->setWindowTitle(PROGRAM_TITLE);
 }
 
-void MainWindow::on_FPSDoubleSpinBox_valueChanged(double arg1)
+void MainWindow::on_loadSubtitleButton_clicked()
+{
+    actionLoad();
+}
+
+void MainWindow::on_saveSubtitleButton_clicked()
+{
+    actionSave();
+}
+
+void MainWindow::on_saveSubtitleAsButton_clicked()
+{
+    actionSaveAs();
+}
+
+void MainWindow::on_FPSDoubleSpinBox_valueChanged()
 {
     ui->FPSlabel->setText("Current FPS:*");
 }
@@ -164,4 +226,20 @@ void MainWindow::on_FPSDoubleSpinBox_editingFinished()
     ui->FPSlabel->setText("Current FPS:");
     subtitleApp.getSubtitles().setFPS(
                 ui->FPSDoubleSpinBox->value());
+}
+
+void MainWindow::on_editButton_clicked()
+{
+    actionEdit();
+}
+
+void MainWindow::on_tableView_doubleClicked()
+{
+    actionEdit();
+}
+
+void MainWindow::on_searchLineEdit_editingFinished()
+{
+    searchPhrase = ui->searchLineEdit->text();
+    refreshTitleList();
 }

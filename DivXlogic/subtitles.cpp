@@ -1,16 +1,12 @@
 #include "subtitles.h"
 
-Subtitles::Subtitles() {}
-
-Subtitles::Subtitles(int f) : FPS(f) {}
-
 double Subtitles::getFPS() const { return FPS; }
 
-long Subtitles::subtitleCo() const { return subtitles.size(); }
+long Subtitles::subtitleCo() const { return (long)subtitles.size(); }
 
-vector<Subtitle*> &Subtitles::getTitles() { return subtitles; }
+std::vector<Subtitle*> &Subtitles::getTitles() { return subtitles; }
 
-vector<Subtitle*> const &Subtitles::getTitles() const
+std::vector<Subtitle*> const &Subtitles::getTitles() const
 {
     return subtitles;
 }

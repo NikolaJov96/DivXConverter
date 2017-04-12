@@ -2,6 +2,8 @@
 
 SubtitleApp::SubtitleApp() {}
 
+SubtitleApp::~SubtitleApp() { clearData(); }
+
 Subtitles &SubtitleApp::getSubtitles()
 {
     // throw if not loaded

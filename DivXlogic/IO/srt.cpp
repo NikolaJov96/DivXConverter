@@ -5,8 +5,6 @@
 #include <QRegExp>
 #include <QDebug>
 
-SRT::SRT() {}
-
 long SRT::timeToLong(const QString &time) const
 {
     // convert string time to ms - format: 01:03:00,900
