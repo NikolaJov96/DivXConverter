@@ -20,6 +20,7 @@ public:
 
     long subtitleCo() const;                            /*!< Returns number of subtitles in container */
     bool isEmpty() const;                               /*!< Checks if container is empty */
+    long indexOf(const QString&) const;
     void addSubTitle(Subtitle*, long t = -1);           /*!< Inserts new subtitle (to the end by default)*/
 private:
     std::vector<Subtitle*> subtitles;                   /*!< Vector of individual subtitles */

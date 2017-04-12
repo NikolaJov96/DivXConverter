@@ -28,6 +28,7 @@ public:
                    FORMATS, double = DEFAULT_FPS);  /*!< Loads subtitle file with provided path, format and FPS */
     void saveTitle(const QString&, FORMATS);        /*!< Saves to file with provided path and format */
     void saveTitle();                               /*!< Saves to file with remembered path and format */
+    void clearData();                               /*!< Clear all data, close opened file */
 private:
     Subtitles subtitles;                            /*!< Subtitle container */
     SRT SRTManager;                                 /*!< Object for SRT format IO */
@@ -38,7 +39,6 @@ private:
     QString filePath = "";                          /*!< Opened file path */
     FORMATS fileType = FORMATS::UNDEFINED;          /*!< Opened file format */
 
-    void clearData();                               /*!< Clear all data, close opened file */
     SubtitleIO const *getIOManager(FORMATS) const;  /*!< Returns IO manager for desired format */
 };
 

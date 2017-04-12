@@ -8,7 +8,6 @@
 #include <QModelIndexList>
 #include <algorithm>
 
-#include "DivXlogic/subtitleio.h"
 #include "edittitledialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -17,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setUI(false);
+    processor.setSubtitles(
+                &subtitleApp.getSubtitles());
 }
 
 MainWindow::~MainWindow()
@@ -112,27 +113,25 @@ void MainWindow::actionSave()
     ui->saveSubtitleButton->setText("Save Subtitle");
 }
 
-void MainWindow::actionSaveAs()
+void MainWindow::actionSaveAs(FORMATS format)
 {
-    // Get saving format
-    FORMATS format;
+    // Get saving format if none is provided
+    if (format == FORMATS::UNDEFINED)
+    {
+        if (ui->SRTRadioButton->isChecked())
+            format = FORMATS::SRT;
+        else if (ui->MPSubRadioButton->isChecked())
+            format = FORMATS::MPSub;
+        else if (ui->MicroDVDRadioButton->isChecked())
+            format = FORMATS::MicroDVD;
+        else { return; /* throw wrong format */ }
+    }
     QString exts = "";
-    if (ui->SRTRadioButton->isChecked())
-    {
-        format = FORMATS::SRT;
-        exts = "*.srt";
+    switch (format) {
+    case FORMATS::SRT: exts = "*.srt"; break;
+    case FORMATS::MPSub: exts = "*.sub"; break;
+    case FORMATS::MicroDVD: exts = "*.sub *.txt"; break;
     }
-    else if (ui->MPSubRadioButton->isChecked())
-    {
-        format = FORMATS::MPSub;
-        exts = "*.sub";
-    }
-    else if (ui->MicroDVDRadioButton->isChecked())
-    {
-        format = FORMATS::MicroDVD;
-        exts = "*.sub *.txt";
-    }
-    else { return; /* throw wrong format */ }
 
     QString path = QFileDialog::getSaveFileName(
                 this, "Save file", "",
@@ -162,16 +161,10 @@ void MainWindow::actionEdit()
     QString data = ui->tableView->model()->
             data(ui->tableView->model()->
                  index(indexes.at(0).row(), 0)).toString();
-    long row = 0;
-    for (auto it = subtitleApp.getSubtitles().getTitles().begin();
-         it != subtitleApp.getSubtitles().getTitles().end(); it++)
-    {
-        if ((*it)->getSStart() == data) break;
-        row++;
-    }
 
     editTitleDialog dialog(
-                subtitleApp.getSubtitles().getTitles()[row],
+                subtitleApp.getSubtitles().getTitles()[
+                subtitleApp.getSubtitles().indexOf(data)],
                 this);
     dialog.setModal(true);
     dialog.exec();
@@ -181,6 +174,24 @@ void MainWindow::actionEdit()
         return a->getStart() < b->getStart();
     });
     refreshTitleList();
+}
+
+void MainWindow::actionClose()
+{
+    if (subtitleApp.isLoaded())
+    {
+        switch (discardChangesDialog()) {
+        case QMessageBox::Save:
+            if (subtitleApp.getFilePath().length() > 0) actionSave();
+            else actionSaveAs();
+            break;
+        case QMessageBox::Cancel: return; break;
+        }
+    }
+    setUI(false);
+    subtitleApp.clearData();
+    refreshTitleList();
+    updateWindowTitle();
 }
 
 void MainWindow::setUI(bool state)
@@ -242,4 +253,54 @@ void MainWindow::on_searchLineEdit_editingFinished()
 {
     searchPhrase = ui->searchLineEdit->text();
     refreshTitleList();
+}
+
+void MainWindow::on_actionOpen_File_triggered()
+{
+    actionLoad();
+}
+
+void MainWindow::on_actionSaveAsSRT_triggered()
+{
+    actionSaveAs(FORMATS::SRT);
+}
+
+void MainWindow::on_actionSaveAsMPSub_triggered()
+{
+    actionSaveAs(FORMATS::MPSub);
+}
+
+void MainWindow::on_actionSaveAsMicroDVD_triggered()
+{
+    actionSaveAs(FORMATS::MicroDVD);
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    if (subtitleApp.isLoaded())
+    {
+        switch (discardChangesDialog()) {
+        case QMessageBox::Save:
+            if (subtitleApp.getFilePath().length() > 0) actionSave();
+            else actionSaveAs();
+            break;
+        case QMessageBox::Cancel: return; break;
+        }
+    }
+    this->close();
+}
+
+void MainWindow::on_actionClose_File_triggered()
+{
+    actionClose();
+}
+
+void MainWindow::on_actionEdit_Subtitle_triggered()
+{
+    actionEdit();
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    actionSave();
 }

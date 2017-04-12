@@ -15,6 +15,19 @@ void Subtitles::setFPS(double fps) { FPS = fps; }
 
 bool Subtitles::isEmpty() const { return subtitles.size() == 0; }
 
+long Subtitles::indexOf(const QString &time) const
+{
+    long row = 0;
+    for (auto it = subtitles.begin();
+         it != subtitles.end(); it++)
+    {
+        if ((*it)->getSStart() == time) break;
+        row++;
+    }
+    if (row == subtitleCo()) return -1;
+    return row;
+}
+
 void Subtitles::addSubTitle(Subtitle *sub, long t)
 {
     if (t == -1) subtitles.push_back(sub);

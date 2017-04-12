@@ -32,14 +32,16 @@ SOURCES += main.cpp\
     DivXlogic/IO/srt.cpp \
     DivXlogic/IO/microdvd.cpp \
     DivXlogic/IO/mpsub.cpp \
-    edittitledialog.cpp
+    edittitledialog.cpp \
+    subtitleprocessing.cpp
 
 HEADERS  += mainwindow.h \
     DivXlogic/subtitleapp.h \
     DivXlogic/subtitles.h \
     DivXlogic/subtitle.h \
     DivXlogic/subtitleio.h \
-    edittitledialog.h
+    edittitledialog.h \
+    subtitleprocessing.h
 
 FORMS    += mainwindow.ui \
     edittitledialog.ui
