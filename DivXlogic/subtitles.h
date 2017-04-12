@@ -3,7 +3,10 @@
 
 #include <vector>
 
+class Subtitles;
+
 #include "subtitle.h"
+#include "subtitleio.h"
 
 /*!
  * \brief The Subtitles class
@@ -25,6 +28,8 @@ public:
 private:
     std::vector<Subtitle*> subtitles;                   /*!< Vector of individual subtitles */
     double FPS = 25.0;                                  /*!< Current FPS setting */
+    QString filePath = "";                              /*!< Opened file path */
+    FORMATS fileType = FORMATS::UNDEFINED;              /*!< Opened file format */
 };
 
 #endif // SUBTITLES_H

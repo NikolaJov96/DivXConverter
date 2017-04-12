@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
 
 const QString PROGRAM_TITLE = "DivX Converter";
 
@@ -40,31 +41,33 @@ private slots:
 
     void on_editButton_clicked();                   /*!< Subtitle edit button clicked handler */
 
-    void on_tableView_doubleClicked();              /*!< Tavle view double click handler */
+    void on_tableView_doubleClicked();              /*!< Table view double click handler */
 
-    void on_searchLineEdit_editingFinished();
+    void on_searchLineEdit_editingFinished();       /*!< Refresh subtitle table on serch phrase edited */
 
-    void on_actionOpen_File_triggered();
+    void on_actionOpen_File_triggered();            /*!< Load File menu item clicked handler */
 
-    void on_actionSaveAsSRT_triggered();
+    void on_actionSaveAsSRT_triggered();            /*!< Save As SRT menu item clicked handler */
 
-    void on_actionSaveAsMPSub_triggered();
+    void on_actionSaveAsMPSub_triggered();          /*!< Save As MPSub menu item clicked handler */
 
-    void on_actionSaveAsMicroDVD_triggered();
+    void on_actionSaveAsMicroDVD_triggered();       /*!< Save As MicroDVD menu item clicked handler */
 
-    void on_actionExit_triggered();
+    void on_actionExit_triggered();                 /*!< Exit menu item clicked handler */
 
-    void on_actionClose_File_triggered();
+    void on_actionClose_File_triggered();           /*!< Close File menu item clicked handler */
 
-    void on_actionEdit_Subtitle_triggered();
+    void on_actionEdit_Subtitle_triggered();        /*!< Edit subtitle menu item clicked handler */
 
-    void on_actionSave_triggered();
+    void on_actionSave_triggered();                 /*!< Save menu item clicked handler */
 
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
-    SubtitleProcessing processor;
+    SubtitleProcessing processor;                   /*!< Object responsible for title manipulation */
     QString searchPhrase = "";                      /*!< Filter subtitles with this phrase */
+    Subtitles *currentFile = nullptr;               /*!< Currently selected file form subtitleApp */
+    QStandardItemModel *currentModel = nullptr;     /*!< Current table view item model */
 
     void actionLoad();                              /*!< Loading title form file acton */
     void actionSave();                              /*!< Saving title to file acton */
@@ -76,6 +79,7 @@ private:
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void setUI(bool);                               /*!< Set enable state to parts of UI */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */
+    void status(const QString&);                    /*!< Show message in status bar */
 };
 
 #endif // MAINWINDOW_H

@@ -16,7 +16,6 @@ const double DEFAULT_FPS = 25.0;
 class SubtitleApp
 {
 public:
-    SubtitleApp();                                  /*!< Default constructor */
     ~SubtitleApp();                                 /*!< Default destructor */
 
     Subtitles &getSubtitles();                      /*!< Returns reference to the Subtitles container */

@@ -3,7 +3,6 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QStandardItemModel>
 #include <QDebug>
 #include <QModelIndexList>
 #include <algorithm>
@@ -18,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setUI(false);
     processor.setSubtitles(
                 &subtitleApp.getSubtitles());
+    ui->statusBar->showMessage("Velcome to DivX Converter!");
 }
 
 MainWindow::~MainWindow()
@@ -28,7 +28,7 @@ MainWindow::~MainWindow()
 int MainWindow::discardChangesDialog() const
 {
     QMessageBox msgBox;
-    msgBox.setText("There is a subtitle loaded.");
+    msgBox.setText("Closing opened subtitle.");
     msgBox.setInformativeText("Do you want to save the current state?");
     msgBox.setStandardButtons(QMessageBox::Save |
                               QMessageBox::Discard | QMessageBox::Cancel);
@@ -38,36 +38,47 @@ int MainWindow::discardChangesDialog() const
 
 void MainWindow::refreshTitleList()
 {
-    // reset table with subtitles
-    delete ui->tableView->model();
-    QStandardItemModel *model =
-            new QStandardItemModel(0, 3);
-    QStringList horizontalLabels =
-        {"Start", "End", "Subtitle text"};
-    model->setHorizontalHeaderLabels(horizontalLabels);
-
-    long ind = 0;
-    QList<QStandardItem*> list;
-    for (Subtitle* &row : subtitleApp.getSubtitles().getTitles())
+    QStandardItemModel *newModel = nullptr;
+    if (subtitleApp.isLoaded())
     {
-        // add title to table
-        if (searchPhrase.length() > 0 &&
-                !row->getText().contains(searchPhrase)) continue;
-        list.clear();
-        list.append(new QStandardItem(row->getSStart()));
-        list.append(new QStandardItem(row->getSEnd()));
-        list.append(new QStandardItem(row->getText()));
-        model->appendRow(list);
-        ind++;
+        newModel = new QStandardItemModel(0, 3);
+        QStringList horizontalLabels =
+            {"Start", "End", "Subtitle text"};
+        newModel->setHorizontalHeaderLabels(horizontalLabels);
+
+        long ind = 0;
+        QList<QStandardItem*> list;
+        for (Subtitle* &row : subtitleApp.getSubtitles().getTitles())
+        {
+            // add title to table
+            if (searchPhrase.length() > 0 &&
+                    !row->getText().contains(searchPhrase)) continue;
+            list.clear();
+            list.append(new QStandardItem(row->getSStart()));
+            list.append(new QStandardItem(row->getSEnd()));
+            list.append(new QStandardItem(row->getText()));
+            newModel->appendRow(list);
+            ind++;
+        }
     }
-    ui->tableView->setModel(model);
-    ui->tableView->verticalHeader()->
-            setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->setColumnWidth(0, 75);
-    ui->tableView->setColumnWidth(1, 75);
-    ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
-    ui->tableView->horizontalHeader()->
-            setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableView->setModel(newModel);
+    if (currentModel)
+    {
+        currentModel->clear();
+        delete currentModel;
+    }
+    currentModel = newModel;
+
+    if (currentModel)
+    {
+        ui->tableView->verticalHeader()->
+                setSectionResizeMode(QHeaderView::ResizeToContents);
+        ui->tableView->setColumnWidth(0, 75);
+        ui->tableView->setColumnWidth(1, 75);
+        ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
+        ui->tableView->horizontalHeader()->
+                setSectionResizeMode(QHeaderView::Fixed);
+    }
 }
 
 void MainWindow::actionLoad()
@@ -86,31 +97,36 @@ void MainWindow::actionLoad()
                 this, "Open file", "",
                 "Titles (*.srt *.sub *.txt);;All Files(*)");
     if (path.length() == 0) return;
+
+    status("*");
     FORMATS format = SubtitleIO::detect(path);
-    ui->loadSubtitleButton->setText("...");
     try {
-        setUI(false);
         subtitleApp.loadTitle(path, format,
                               ui->iFPSDoubleSpinBox->value());
-        setUI(true);
-        ui->editButton->setEnabled(true);
-    } catch (...) {}
+    }
+    catch (...)
+    {
+        setUI(false);
+        status("Unable to load file! - " + path);
+    }
     updateWindowTitle();
-    ui->loadSubtitleButton->setText("Load Subtitle");
     ui->FPSDoubleSpinBox->setValue(subtitleApp.getSubtitles().getFPS());
     ui->FPSlabel->setText("Current FPS:");
     refreshTitleList();
+    status("File loaded! - " + path);
 }
 
 void MainWindow::actionSave()
 {
-    ui->saveSubtitleButton->setText("...");
-    try
+    status("*");
+    try { subtitleApp.saveTitle(); }
+    catch (...)
     {
-        subtitleApp.saveTitle();
+        status("Unable do save file! - " +
+               subtitleApp.getFilePath());
     }
-    catch (...) { /* show message - umable to save */ }
-    ui->saveSubtitleButton->setText("Save Subtitle");
+    status("File saved! - " +
+           subtitleApp.getFilePath());
 }
 
 void MainWindow::actionSaveAs(FORMATS format)
@@ -124,7 +140,10 @@ void MainWindow::actionSaveAs(FORMATS format)
             format = FORMATS::MPSub;
         else if (ui->MicroDVDRadioButton->isChecked())
             format = FORMATS::MicroDVD;
-        else { return; /* throw wrong format */ }
+        else {
+            status("Undefined format while saving the file");
+            return;
+        }
     }
     QString exts = "";
     switch (format) {
@@ -136,16 +155,17 @@ void MainWindow::actionSaveAs(FORMATS format)
     QString path = QFileDialog::getSaveFileName(
                 this, "Save file", "",
                 "Titles (" + exts + ");;All Files(*)");
-
     if (path.length() == 0) return;
-    ui->saveSubtitleAsButton->setText("...");
-    try
-    {
-        subtitleApp.saveTitle(path, format);
+
+    status("*");
+    try { subtitleApp.saveTitle(path, format); }
+    catch (...) {
+        setUI(false);
+        status("Unable do save file! - " +
+               subtitleApp.getFilePath());
     }
-    catch (...) { setUI(false); }
     updateWindowTitle();
-    ui->saveSubtitleAsButton->setText("Save Subtitle As");
+    status("File saved! - " + subtitleApp.getFilePath());
 }
 
 void MainWindow::actionEdit()
@@ -192,6 +212,7 @@ void MainWindow::actionClose()
     subtitleApp.clearData();
     refreshTitleList();
     updateWindowTitle();
+    status("File closed!");
 }
 
 void MainWindow::setUI(bool state)
@@ -210,6 +231,11 @@ void MainWindow::updateWindowTitle()
                              subtitleApp.getFilePath());
     else
         this->setWindowTitle(PROGRAM_TITLE);
+}
+
+void MainWindow::status(const QString &message)
+{
+    ui->statusBar->showMessage(message);
 }
 
 void MainWindow::on_loadSubtitleButton_clicked()

@@ -1,7 +1,5 @@
 #include "subtitleapp.h"
 
-SubtitleApp::SubtitleApp() {}
-
 SubtitleApp::~SubtitleApp() { clearData(); }
 
 Subtitles &SubtitleApp::getSubtitles()
