@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>824</width>
-    <height>425</height>
+    <width>807</width>
+    <height>434</height>
    </rect>
   </property>
   <property name="font">
@@ -55,25 +55,6 @@
     </property>
     <property name="wordWrap">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>10</y>
-      <width>631</width>
-      <height>331</height>
-     </rect>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::ContiguousSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="saveSubtitleButton">
@@ -237,13 +218,53 @@
      </rect>
     </property>
    </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>10</y>
+      <width>631</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Rounded</enum>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Tab 1</string>
+     </attribute>
+    </widget>
+   </widget>
+   <widget class="QTableView" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>631</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::ContiguousSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>824</width>
+     <width>807</width>
      <height>21</height>
     </rect>
    </property>
@@ -284,8 +305,25 @@
     <addaction name="actionEdit_Subtitle"/>
     <addaction name="actionDelete_Subtitle"/>
    </widget>
+   <widget class="QMenu" name="menuAdvanced">
+    <property name="title">
+     <string>Advanced</string>
+    </property>
+    <widget class="QMenu" name="menuTime_Shift">
+     <property name="title">
+      <string>Time Shift</string>
+     </property>
+     <addaction name="actionShift_Sellection"/>
+     <addaction name="actionShift_All"/>
+    </widget>
+    <addaction name="menuTime_Shift"/>
+    <addaction name="actionAuto_Concat"/>
+    <addaction name="actionAuto_Devide"/>
+    <addaction name="actionConcat_Files"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuAdvanced"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -370,6 +408,31 @@
   <action name="actionNew_File">
    <property name="text">
     <string>New File</string>
+   </property>
+  </action>
+  <action name="actionShift_Sellection">
+   <property name="text">
+    <string>Shift Sellection</string>
+   </property>
+  </action>
+  <action name="actionShift_All">
+   <property name="text">
+    <string>Shift All</string>
+   </property>
+  </action>
+  <action name="actionAuto_Concat">
+   <property name="text">
+    <string>Auto Concat</string>
+   </property>
+  </action>
+  <action name="actionAuto_Devide">
+   <property name="text">
+    <string>Auto Devide</string>
+   </property>
+  </action>
+  <action name="actionConcat_Files">
+   <property name="text">
+    <string>Concat Files</string>
    </property>
   </action>
  </widget>

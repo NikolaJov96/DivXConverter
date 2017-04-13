@@ -1,7 +1,7 @@
 #ifndef SUBTITLEAPP_H
 #define SUBTITLEAPP_H
 
-const double DEFAULT_FPS = 25.0;
+#include <vector>
 
 #include "subtitleio.h"
 #include "subtitles.h"
@@ -18,25 +18,19 @@ class SubtitleApp
 public:
     ~SubtitleApp();                                 /*!< Default destructor */
 
-    Subtitles &getSubtitles();                      /*!< Returns reference to the Subtitles container */
+    Subtitles *getSubtitles(int);
 
-    bool isLoaded() const;                          /*!< Checks if subtitle file is loaded */
-    QString const &getFilePath() const;             /*!< Returns reference to opened file path */
-
+    void newTitle();
     void loadTitle(const QString&,
                    FORMATS, double = DEFAULT_FPS);  /*!< Loads subtitle file with provided path, format and FPS */
-    void saveTitle(const QString&, FORMATS);        /*!< Saves to file with provided path and format */
-    void saveTitle();                               /*!< Saves to file with remembered path and format */
-    void clearData();                               /*!< Clear all data, close opened file */
+    void saveTitle(const QString&, FORMATS, int);   /*!< Saves to file with provided path and format */
+    void saveTitle(int);                            /*!< Saves to file with remembered path and format */
+    void closeFile(int);                            /*!< Close opened file */
 private:
-    Subtitles subtitles;                            /*!< Subtitle container */
+    std::vector<Subtitles*> files;                  /*!< Vector of all opened files */
     SRT SRTManager;                                 /*!< Object for SRT format IO */
     MPSub MPSubManager;                             /*!< Object for MPSub format IO */
     MicroDVD MicroDVDManager;                       /*!< Object for MicroDVD format IO */
-
-    bool loaded = false;                            /*!< File opened indicator */
-    QString filePath = "";                          /*!< Opened file path */
-    FORMATS fileType = FORMATS::UNDEFINED;          /*!< Opened file format */
 
     SubtitleIO const *getIOManager(FORMATS) const;  /*!< Returns IO manager for desired format */
 };

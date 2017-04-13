@@ -1,62 +1,66 @@
 #include "subtitleapp.h"
 
-SubtitleApp::~SubtitleApp() { clearData(); }
-
-Subtitles &SubtitleApp::getSubtitles()
+SubtitleApp::~SubtitleApp()
 {
-    // throw if not loaded
-    // if (!isLoaded()) throw ...;
-    return subtitles;
+    for (auto file : files) delete file;
+    files.clear();
 }
 
-bool SubtitleApp::isLoaded() const { return loaded; }
-
-QString const &SubtitleApp::getFilePath() const
+Subtitles *SubtitleApp::getSubtitles(int ind)
 {
-    // throw if not loaded
-    // if (!isLoaded()) throw ...;
-    return filePath;
+    return files[ind];
 }
 
-void SubtitleApp::loadTitle(const QString &path, FORMATS format, double fps)
+void SubtitleApp::newTitle()
+{
+    files.push_back(new Subtitles());
+}
+
+void SubtitleApp::loadTitle(const QString &path,
+                            FORMATS format, double fps)
 {
     if (format == FORMATS::UNDEFINED) { /* throw unable to load */ }
-    clearData();
+    Subtitles *subs = new Subtitles();
     try
     {
-        getIOManager(format)->loadTitle(subtitles, path, fps);
+        getIOManager(format)->loadTitle(*subs, path, fps);
     }
-    catch (...) { /* throw unable to load */ }
-    loaded = true;
-    filePath = path;
-    fileType = format;
+    catch (...)
+    {
+        delete subs;
+        /* throw unable to load */
+    }
+    subs->setFilePath(path);
+    subs->setFormat(format);
+    subs->setFPS(fps);
+    files.push_back(subs);
 }
 
-void SubtitleApp::saveTitle(const QString &path, FORMATS format)
+void SubtitleApp::saveTitle(const QString &path, FORMATS format, int ind)
 {
-    if (format == FORMATS::UNDEFINED) { /* throw unable to save */ }
+    if (format == FORMATS::UNDEFINED ||
+            ind < 0 || ind >= files.size()) { /* throw unable to save */ }
     try
     {
-        getIOManager(format)->saveTitle(subtitles, path);
-        filePath = path;
-        fileType = format;
+        getIOManager(format)->saveTitle(*files[ind], path);
     }
     catch (...) { /* throw unable to save */ }
+    files[ind]->setFilePath(path);
+    files[ind]->setFormat(format);
 }
 
-void SubtitleApp::saveTitle()
+void SubtitleApp::saveTitle(int ind)
 {
-    saveTitle(filePath, fileType);
+    if (ind < 0 || ind >= files.size()) { /* throw unable to save */ };
+    saveTitle(files[ind]->getFilePath(),
+              files[ind]->getFormat(), ind);
 }
 
-void SubtitleApp::clearData()
+void SubtitleApp::closeFile(int ind)
 {
-    for (auto row : subtitles.getTitles()) delete row;
-    subtitles.getTitles().clear();
-    loaded = false;
-    filePath = "";
-    fileType = FORMATS::UNDEFINED;
-    subtitles.setFPS(DEFAULT_FPS);
+    if (ind < 0 || ind >= files.size()) return;
+    delete files[ind];
+    files.erase(files.begin() + ind);
 }
 
 SubtitleIO const *SubtitleApp::getIOManager(FORMATS format) const

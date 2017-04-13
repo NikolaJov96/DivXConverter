@@ -1,8 +1,10 @@
 #include "subtitles.h"
 
-double Subtitles::getFPS() const { return FPS; }
-
-long Subtitles::subtitleCo() const { return (long)subtitles.size(); }
+Subtitles::~Subtitles()
+{
+    for (auto row : subtitles) delete row;
+    subtitles.clear();
+}
 
 std::vector<Subtitle*> &Subtitles::getTitles() { return subtitles; }
 
@@ -11,9 +13,24 @@ std::vector<Subtitle*> const &Subtitles::getTitles() const
     return subtitles;
 }
 
+double Subtitles::getFPS() const { return FPS; }
+
+QString const &Subtitles::getFilePath() const
+{
+    return filePath;
+}
+
+FORMATS Subtitles::getFormat() const { return fileType; }
+
+bool Subtitles::isEdited() const { return edited; }
+
 void Subtitles::setFPS(double fps) { FPS = fps; }
 
-bool Subtitles::isEmpty() const { return subtitles.size() == 0; }
+void Subtitles::setFilePath(const QString &path) { filePath = path; }
+
+void Subtitles::setFormat(FORMATS format) { fileType = format; }
+
+void Subtitles::setEdited(bool e) { edited = e; }
 
 long Subtitles::indexOf(const QString &time) const
 {
@@ -24,16 +41,17 @@ long Subtitles::indexOf(const QString &time) const
         if ((*it)->getSStart() == time) break;
         row++;
     }
-    if (row == subtitleCo()) return -1;
+    if (row == subtitles.size()) return -1;
     return row;
 }
 
-void Subtitles::addSubTitle(Subtitle *sub, long t)
+void Subtitles::addSubTitle(Subtitle *sub)
 {
-    if (t == -1) subtitles.push_back(sub);
-    else
-    {
-        // find a place to insert
-        // long ind = std::subtitles.
-    }
+    subtitles.push_back(sub);
+    if (subtitles.size() > 1 && sub->getStart() <
+            subtitles[subtitles.size() - 2]->getStart())
+                std::sort(subtitles.begin(), subtitles.end(),
+                          [](const Subtitle *a, const Subtitle *b) -> bool {
+                    return a->getStart() < b->getStart();
+                });
 }

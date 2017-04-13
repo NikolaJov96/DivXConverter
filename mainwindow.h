@@ -61,6 +61,10 @@ private slots:
 
     void on_actionSave_triggered();                 /*!< Save menu item clicked handler */
 
+    void on_tabWidget_currentChanged(int index);
+
+    void on_actionNew_File_triggered();
+
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
@@ -68,7 +72,9 @@ private:
     QString searchPhrase = "";                      /*!< Filter subtitles with this phrase */
     Subtitles *currentFile = nullptr;               /*!< Currently selected file form subtitleApp */
     QStandardItemModel *currentModel = nullptr;     /*!< Current table view item model */
+    int currFileInd = 0;
 
+    void changeContext(int);
     void actionLoad();                              /*!< Loading title form file acton */
     void actionSave();                              /*!< Saving title to file acton */
     void actionSaveAs(
@@ -77,7 +83,6 @@ private:
     void actionClose();                             /*!< Close opened file */
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
-    void setUI(bool);                               /*!< Set enable state to parts of UI */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */
     void status(const QString&);                    /*!< Show message in status bar */
 };

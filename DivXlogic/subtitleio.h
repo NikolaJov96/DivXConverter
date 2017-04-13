@@ -11,6 +11,8 @@
  */
 enum class FORMATS {UNDEFINED, SRT, MPSub, MicroDVD};
 
+const double DEFAULT_FPS = 25.0;
+
 #include "subtitles.h"
 
 /*!
