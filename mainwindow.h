@@ -26,7 +26,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);       /*!< Default constructor */
-    ~MainWindow();                                  /*!< Default destructor */
+    ~MainWindow();
+
+    void actionEdit();                              /*!< Edit selected title acton */                                 /*!< Default destructor */
 
 private slots:
 
@@ -36,7 +38,7 @@ private slots:
 
     void on_saveSubtitleAsButton_clicked();         /*!< Save subtitle as button clicked handler */
 
-    void on_FPSDoubleSpinBox_valueChanged();        /*!< FPS spin box value changed handler */
+    void on_FPSDoubleSpinBox_valueChanged(double);        /*!< FPS spin box value changed handler */
 
     void on_FPSDoubleSpinBox_editingFinished();     /*!< FPS spin box editing finished handler */
 
@@ -64,11 +66,19 @@ private slots:
 
     void on_actionNew_File_triggered();
 
+    void on_actionAdd_Subtitle_triggered();
+
+    void on_actionDelete_Subtitle_triggered();
+
+    void on_actionShift_Sellection_triggered();
+
+    void on_actionShift_All_triggered();
+
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
 
-    SubtitleProcessing processor;                   /*!< Object responsible for title manipulation */
+    SubtitleProcessing *processor = nullptr;                   /*!< Object responsible for title manipulation */
     Subtitles *currentFile = nullptr;
     int currFileInd = 0;
     TabForm *currTab = nullptr;
@@ -79,8 +89,11 @@ private:
     void actionSave();                              /*!< Saving title to file acton */
     void actionSaveAs(
             FORMATS format = FORMATS::UNDEFINED);   /*!< Saving title - as to file acton */
-    void actionEdit();                              /*!< Edit selected title acton */
+    void actionAddSubtitle();
     void actionClose();                             /*!< Close opened file */
+    void actionDelete();
+    void actionTimeShift(QModelIndexList*);
+
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */

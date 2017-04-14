@@ -64,3 +64,4 @@ void Subtitles::addSubTitle(Subtitle *sub)
                 });
     edited = true;
 }
+

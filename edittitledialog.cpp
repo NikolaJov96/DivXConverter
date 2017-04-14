@@ -44,7 +44,7 @@ void editTitleDialog::on_pushButton_clicked()
     subtitle->getEnd() =
             ((ui->spinBox_5->value() * 60 +
               ui->spinBox_6->value()) * 60 +
-            ui->spinBox_7->value()) * 1000 +
+             ui->spinBox_7->value()) * 1000 +
             ui->spinBox_8->value();
 
     QString text = ui->textEdit->toPlainText();

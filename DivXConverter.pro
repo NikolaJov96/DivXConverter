@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     DivXlogic/IO/mpsub.cpp \
     edittitledialog.cpp \
     subtitleprocessing.cpp \
-    tabform.cpp
+    tabform.cpp \
+    timeshiftdialog.cpp
 
 HEADERS  += mainwindow.h \
     DivXlogic/subtitleapp.h \
@@ -43,8 +44,10 @@ HEADERS  += mainwindow.h \
     DivXlogic/subtitleio.h \
     edittitledialog.h \
     subtitleprocessing.h \
-    tabform.h
+    tabform.h \
+    timeshiftdialog.h
 
 FORMS    += mainwindow.ui \
     edittitledialog.ui \
-    tabform.ui
+    tabform.ui \
+    timeshiftdialog.ui

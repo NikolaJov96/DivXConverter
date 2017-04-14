@@ -4,10 +4,13 @@
 #include <QStandardItemModel>
 #include <QDebug>
 
+#include "mainwindow.h"
+
 TabForm::TabForm(Subtitles *subs, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TabForm),
-    file(subs)
+    file(subs),
+    processor(subs, parent)
 {
     ui->setupUi(this);
     refreshTitleList();
@@ -32,6 +35,11 @@ QString const &TabForm::getSearchPhrase() const
 Subtitles *TabForm::getFile() { return file; }
 
 QTableView *TabForm::getTable() { return ui->tableView; }
+
+SubtitleProcessing *TabForm::getProcessor()
+{
+    return &processor;
+}
 
 void TabForm::setSearhPhrase(const QString &phrase)
 {
@@ -92,4 +100,10 @@ void TabForm::refreshTitleList()
         ui->tableView->horizontalHeader()->
                 setSectionResizeMode(QHeaderView::Fixed);
     }
+}
+
+void TabForm::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    qInfo() << "Double click";
+    static_cast<MainWindow*>(parent())->actionEdit();
 }

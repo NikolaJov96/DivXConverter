@@ -25,6 +25,14 @@ QString Subtitle::getSEnd() const
     return longToTime(end);
 }
 
+bool Subtitle::operator==(const Subtitle &sub) const
+{
+    if (sub.text != text) return false;
+    if (sub.start != start) return false;
+    if (sub.end != end) return false;
+    return true;
+}
+
 QString Subtitle::longToTime(long ms) const
 {
     return QString("%1").arg(ms / 1000 / 60 / 60, 2, 10, QChar('0')) + ":" +

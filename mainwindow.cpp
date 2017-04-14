@@ -8,17 +8,17 @@
 #include <algorithm>
 
 #include "edittitledialog.h"
+#include "timeshiftdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // new blank file
+
     subtitleApp.newTitle();
-    // new tab for the file
     ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(0)), "new");
-    // romove initial tab
+    // remove initial tab
     ui->tabWidget->removeTab(0);
     currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
     changeContext(0);
@@ -50,7 +50,7 @@ void MainWindow::changeContext(int ind)
     ui->tabWidget->setCurrentIndex(ind);
     currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
     currentFile = currTab->getFile();
-    processor.setSubtitles(currentFile);
+    processor = currTab->getProcessor();
 
     // update GUI
     ui->FPSDoubleSpinBox->setValue(currentFile->getFPS());
@@ -97,6 +97,13 @@ void MainWindow::actionLoad()
 
 void MainWindow::actionSave()
 {
+    // call Save As if file is not initially saved
+    if (currentFile->getFilePath().length() == 0)
+    {
+        actionSaveAs();
+        return;
+    }
+
     status("*");
     try { subtitleApp.saveTitle(currFileInd); }
     catch (...)
@@ -155,34 +162,42 @@ void MainWindow::actionSaveAs(FORMATS format)
     status("File saved! - " + currentFile->getFilePath());
 }
 
-// edit is responsibility of subtitle proccessor
 void MainWindow::actionEdit()
 {
-    // modify to work through processor
     QModelIndexList indexes =
             currTab->getTable()->selectionModel()->
             selection().indexes();
+
+
+    // one row - three items
     if (indexes.count() != 3)
     {
-        /*  */
+        status("Select one table row to edit.");
         return;
     }
     QString data = currTab->getTable()->model()->
             data(currTab->getTable()->model()->
                  index(indexes.at(0).row(), 0)).toString();
 
-    editTitleDialog dialog(
-                currentFile->getTitles()[
-                currentFile->indexOf(data)],
-                this);
-    dialog.setModal(true);
-    dialog.exec();
-    std::sort(currentFile->getTitles().begin(),
-              currentFile->getTitles().end(),
-              [](const Subtitle *a, const Subtitle *b) -> bool {
-        return a->getStart() < b->getStart();
-    });
-    currTab->refreshTitleList();
+    // refresh GUI only if title is modified
+    if (processor->editTitle(data))
+    {
+        status("*");
+        currTab->refreshTitleList();
+        updateWindowTitle();
+        status("Modification applied!");
+    }
+}
+
+void MainWindow::actionAddSubtitle()
+{
+    if (processor->addSubtitle())
+    {
+        status("*");
+        currTab->refreshTitleList();
+        updateWindowTitle();
+        status("Subtitle added!");
+    }
 }
 
 void MainWindow::actionClose()
@@ -210,6 +225,84 @@ void MainWindow::actionClose()
 
     // Always jump to the first tab
     changeContext(0);
+}
+
+void MainWindow::actionDelete()
+{
+    QModelIndexList indexes =
+            currTab->getTable()->selectionModel()->
+            selection().indexes();
+
+    if (indexes.count() == 0)
+    {
+        status("Select rows in table to delete.");
+        return;
+    }
+
+    for (int i = 0; i < indexes.count(); i += 3)
+    {
+        QString data = currTab->getTable()->model()->
+                data(currTab->getTable()->model()->
+                     index(indexes.at(i).row(), 0)).toString();
+        processor->deleteSubtitle(data);
+    }
+
+    // deletion can not fail
+    status("*");
+    currTab->refreshTitleList();
+    updateWindowTitle();
+    status("Subtitle(s) deleted!");
+}
+
+void MainWindow::actionTimeShift(QModelIndexList *indexes)
+{
+    if (indexes && indexes->count() == 0)
+    {
+        status("Select rows in table to shift.");
+        return;
+    }
+
+    // get delta time
+    long shift = 0;
+    TimeShiftDialog dialog(shift, this);
+    dialog.setModal(true);
+    dialog.exec();
+    if (shift == 0) return;
+
+    try
+    {
+        if (indexes)
+        {
+            QString data = currTab->getTable()->model()->
+                    data(currTab->getTable()->model()->
+                         index(indexes->at(0).row(), 0)).toString();
+            if (!processor->timeShift(data, shift)) throw 1;
+            for (int i = 1; i < indexes->count(); i += 3)
+            {
+                data = currTab->getTable()->model()->
+                        data(currTab->getTable()->model()->
+                             index(indexes->at(i).row(), 0)).toString();
+                processor->timeShift(data, shift);
+            }
+        }
+        else
+        {
+            if (!processor->timeShift(0, shift)) throw 1;
+            for (long i = 1; i < currentFile->getTitles().size(); i++)
+                processor->timeShift(i, shift);
+        }
+    }
+    catch (int e)
+    {
+        if (e == 1) status("Title can not statrt at negative time!");
+        else status("Unknown error - title might be corrupted!");
+        return;
+    }
+
+    status("*");
+    currTab->refreshTitleList();
+    updateWindowTitle();
+    status("Subtitle(s) shifted!");
 }
 
 void MainWindow::updateWindowTitle()
@@ -240,7 +333,7 @@ void MainWindow::on_saveSubtitleAsButton_clicked()
     actionSaveAs();
 }
 
-void MainWindow::on_FPSDoubleSpinBox_valueChanged()
+void MainWindow::on_FPSDoubleSpinBox_valueChanged(double val)
 {
     ui->FPSlabel->setText("Current FPS:*");
 }
@@ -328,4 +421,27 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 void MainWindow::on_actionNew_File_triggered()
 {
     actionNew();
+}
+
+void MainWindow::on_actionAdd_Subtitle_triggered()
+{
+    actionAddSubtitle();
+}
+
+void MainWindow::on_actionDelete_Subtitle_triggered()
+{
+    actionDelete();
+}
+
+void MainWindow::on_actionShift_Sellection_triggered()
+{
+    QModelIndexList indexes =
+            currTab->getTable()->selectionModel()->
+            selection().indexes();
+    actionTimeShift(&indexes);
+}
+
+void MainWindow::on_actionShift_All_triggered()
+{
+    actionTimeShift(nullptr);
 }
