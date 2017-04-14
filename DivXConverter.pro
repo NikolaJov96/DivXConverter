@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     DivXlogic/IO/microdvd.cpp \
     DivXlogic/IO/mpsub.cpp \
     edittitledialog.cpp \
-    subtitleprocessing.cpp
+    subtitleprocessing.cpp \
+    tabform.cpp
 
 HEADERS  += mainwindow.h \
     DivXlogic/subtitleapp.h \
@@ -41,7 +42,9 @@ HEADERS  += mainwindow.h \
     DivXlogic/subtitle.h \
     DivXlogic/subtitleio.h \
     edittitledialog.h \
-    subtitleprocessing.h
+    subtitleprocessing.h \
+    tabform.h
 
 FORMS    += mainwindow.ui \
-    edittitledialog.ui
+    edittitledialog.ui \
+    tabform.ui

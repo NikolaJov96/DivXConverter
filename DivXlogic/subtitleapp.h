@@ -19,6 +19,7 @@ public:
     ~SubtitleApp();                                 /*!< Default destructor */
 
     Subtitles *getSubtitles(int);
+    int getFilesCo();
 
     void newTitle();
     void loadTitle(const QString&,

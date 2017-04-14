@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>807</width>
-    <height>434</height>
+    <width>842</width>
+    <height>462</height>
    </rect>
   </property>
   <property name="font">
@@ -223,8 +223,8 @@
      <rect>
       <x>150</x>
       <y>10</y>
-      <width>631</width>
-      <height>31</height>
+      <width>671</width>
+      <height>381</height>
      </rect>
     </property>
     <property name="tabShape">
@@ -233,30 +233,11 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Page</string>
      </attribute>
     </widget>
-   </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>30</y>
-      <width>631</width>
-      <height>331</height>
-     </rect>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::ContiguousSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -264,7 +245,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>807</width>
+     <width>842</width>
      <height>21</height>
     </rect>
    </property>

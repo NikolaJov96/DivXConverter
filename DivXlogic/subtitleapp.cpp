@@ -11,6 +11,8 @@ Subtitles *SubtitleApp::getSubtitles(int ind)
     return files[ind];
 }
 
+int SubtitleApp::getFilesCo() { return files.size(); }
+
 void SubtitleApp::newTitle()
 {
     files.push_back(new Subtitles());
@@ -33,6 +35,7 @@ void SubtitleApp::loadTitle(const QString &path,
     subs->setFilePath(path);
     subs->setFormat(format);
     subs->setFPS(fps);
+    subs->setEdited(false);
     files.push_back(subs);
 }
 
@@ -44,9 +47,10 @@ void SubtitleApp::saveTitle(const QString &path, FORMATS format, int ind)
     {
         getIOManager(format)->saveTitle(*files[ind], path);
     }
-    catch (...) { /* throw unable to save */ }
+    catch (...) { /* throw unable to save */ return; }
     files[ind]->setFilePath(path);
     files[ind]->setFormat(format);
+    files[ind]->setEdited(false);
 }
 
 void SubtitleApp::saveTitle(int ind)

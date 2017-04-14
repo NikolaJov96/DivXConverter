@@ -9,6 +9,7 @@ const QString PROGRAM_TITLE = "DivX Converter";
 #include "DivXlogic/subtitleapp.h"
 #include "DivXlogic/subtitleio.h"
 #include "subtitleprocessing.h"
+#include "tabform.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,8 +42,6 @@ private slots:
 
     void on_editButton_clicked();                   /*!< Subtitle edit button clicked handler */
 
-    void on_tableView_doubleClicked();              /*!< Table view double click handler */
-
     void on_searchLineEdit_editingFinished();       /*!< Refresh subtitle table on serch phrase edited */
 
     void on_actionOpen_File_triggered();            /*!< Load File menu item clicked handler */
@@ -68,13 +67,14 @@ private slots:
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
+
     SubtitleProcessing processor;                   /*!< Object responsible for title manipulation */
-    QString searchPhrase = "";                      /*!< Filter subtitles with this phrase */
-    Subtitles *currentFile = nullptr;               /*!< Currently selected file form subtitleApp */
-    QStandardItemModel *currentModel = nullptr;     /*!< Current table view item model */
+    Subtitles *currentFile = nullptr;
     int currFileInd = 0;
+    TabForm *currTab = nullptr;
 
     void changeContext(int);
+    void actionNew();
     void actionLoad();                              /*!< Loading title form file acton */
     void actionSave();                              /*!< Saving title to file acton */
     void actionSaveAs(

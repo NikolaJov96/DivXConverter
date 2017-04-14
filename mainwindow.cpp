@@ -14,10 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // new blank file
     subtitleApp.newTitle();
-    currentModel = nullptr;
+    // new tab for the file
+    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(0)), "new");
+    // romove initial tab
+    ui->tabWidget->removeTab(0);
+    currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
     changeContext(0);
-    processor.setSubtitles(currentFile);
     ui->statusBar->showMessage("Velcome to DivX Converter!");
 }
 
@@ -37,85 +41,58 @@ int MainWindow::discardChangesDialog() const
     return msgBox.exec();
 }
 
-void MainWindow::refreshTitleList()
-{
-    QStandardItemModel *newModel = nullptr;
-    if (currentFile->getTitles().size() > 0)
-    {
-        newModel = new QStandardItemModel(0, 3);
-        QStringList horizontalLabels =
-            {"Start", "End", "Subtitle text"};
-        newModel->setHorizontalHeaderLabels(horizontalLabels);
-
-        long ind = 0;
-        QList<QStandardItem*> list;
-        for (Subtitle* &row : currentFile->getTitles())
-        {
-            // add title to table
-            if (searchPhrase.length() > 0 &&
-                    !row->getText().contains(searchPhrase)) continue;
-            list.clear();
-            list.append(new QStandardItem(row->getSStart()));
-            list.append(new QStandardItem(row->getSEnd()));
-            list.append(new QStandardItem(row->getText()));
-            newModel->appendRow(list);
-            ind++;
-        }
-    }
-    ui->tableView->setModel(newModel);
-    if (currentModel)
-    {
-        currentModel->clear();
-        delete currentModel;
-    }
-    currentModel = newModel;
-
-    if (currentModel)
-    {
-        ui->tableView->verticalHeader()->
-                setSectionResizeMode(QHeaderView::ResizeToContents);
-        ui->tableView->setColumnWidth(0, 75);
-        ui->tableView->setColumnWidth(1, 75);
-        ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
-        ui->tableView->horizontalHeader()->
-                setSectionResizeMode(QHeaderView::Fixed);
-    }
-}
-
 void MainWindow::changeContext(int ind)
 {
     status("*");
-    currentFile = subtitleApp.getSubtitles(ind);
+    // setup new mainwindow params
     currFileInd = ind;
-    processor.setSubtitles(currentFile);
-    ui->FPSDoubleSpinBox->setValue(currentFile->getFPS());
-    ui->FPSlabel->setText("Current FPS:");
+    // switch tab to requested
     ui->tabWidget->setCurrentIndex(ind);
-    refreshTitleList();
+    currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
+    currentFile = currTab->getFile();
+    processor.setSubtitles(currentFile);
+
+    // update GUI
+    ui->FPSDoubleSpinBox->setValue(currentFile->getFPS());
+    ui->searchLineEdit->setText(currTab->getSearchPhrase());
+    ui->FPSlabel->setText("Current FPS:");
     updateWindowTitle();
     status("");
 }
 
+void MainWindow::actionNew()
+{
+    subtitleApp.newTitle();
+    int ind = subtitleApp.getFilesCo() - 1;
+    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+    changeContext(ind);
+}
+
 void MainWindow::actionLoad()
 {
+    // Get loading path
     QString path = QFileDialog::getOpenFileName(
                 this, "Open file", "",
-                "Titles (*.srt *.sub *.txt);;All Files(*)");
+                "Titles (*.srt *.sub *.txt);;All Files(*)");\
+    // Retiurn if loading is canceled
     if (path.length() == 0) return;
 
+    // Load form path
     status("*");
     FORMATS format = SubtitleIO::detect(path);
     try {
         subtitleApp.loadTitle(path, format,
                               ui->iFPSDoubleSpinBox->value());
-        ui->tabWidget->addTab(new QWidget, "naziv");
-        changeContext(ui->tabWidget->count() - 1);
-        status("File loaded! - " + path);
     }
     catch (...)
     {
         status("Unable to load file! - " + path);
+        return;
     }
+    int ind = subtitleApp.getFilesCo() - 1;
+    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+    changeContext(ind);
+    status("File loaded! - " + path);
 }
 
 void MainWindow::actionSave()
@@ -126,8 +103,10 @@ void MainWindow::actionSave()
     {
         status("Unable do save file! - " +
                currentFile->getFilePath());
+        return;
     }
     currentFile->setEdited(false);
+    updateWindowTitle();
     status("File saved! - " +
            currentFile->getFilePath());
 }
@@ -148,18 +127,24 @@ void MainWindow::actionSaveAs(FORMATS format)
             return;
         }
     }
+
+    // Chose file extensions
     QString exts = "";
-    switch (format) {
+    switch (format)
+    {
     case FORMATS::SRT: exts = "*.srt"; break;
     case FORMATS::MPSub: exts = "*.sub"; break;
     case FORMATS::MicroDVD: exts = "*.sub *.txt"; break;
     }
 
+    // Get saving path
     QString path = QFileDialog::getSaveFileName(
                 this, "Save file", "",
                 "Titles (" + exts + ");;All Files(*)");
+    // Return if saving is canceled
     if (path.length() == 0) return;
 
+    // Save to new file and change context
     status("*");
     try { subtitleApp.saveTitle(path, format, currFileInd); }
     catch (...) {
@@ -167,23 +152,23 @@ void MainWindow::actionSaveAs(FORMATS format)
                currentFile->getFilePath());
     }
     updateWindowTitle();
-    currentFile->setEdited(false);
     status("File saved! - " + currentFile->getFilePath());
 }
 
+// edit is responsibility of subtitle proccessor
 void MainWindow::actionEdit()
 {
     // modify to work through processor
     QModelIndexList indexes =
-            ui->tableView->selectionModel()->
+            currTab->getTable()->selectionModel()->
             selection().indexes();
     if (indexes.count() != 3)
     {
         /*  */
         return;
     }
-    QString data = ui->tableView->model()->
-            data(ui->tableView->model()->
+    QString data = currTab->getTable()->model()->
+            data(currTab->getTable()->model()->
                  index(indexes.at(0).row(), 0)).toString();
 
     editTitleDialog dialog(
@@ -197,14 +182,16 @@ void MainWindow::actionEdit()
               [](const Subtitle *a, const Subtitle *b) -> bool {
         return a->getStart() < b->getStart();
     });
-    refreshTitleList();
+    currTab->refreshTitleList();
 }
 
 void MainWindow::actionClose()
 {
+    // Confirm closing
     if (currentFile->isEdited())
     {
-        switch (discardChangesDialog()) {
+        switch (discardChangesDialog())
+        {
         case QMessageBox::Save:
             if (currentFile->getFilePath().length() > 0) actionSave();
             else actionSaveAs();
@@ -212,23 +199,25 @@ void MainWindow::actionClose()
         case QMessageBox::Cancel: return; break;
         }
     }
-    subtitleApp.closeFile(currFileInd);
-    //models.erase(models.begin() + currFileInd);
-    ui->tabWidget->removeTab(currFileInd);
-    if (currFileInd > 0) changeContext(currFileInd - 1);
-    else
-    {
-        if (ui->tabWidget->count() == 0) subtitleApp.newTitle();
-        //models.push_back(nullptr);
-        changeContext(0);
-    }
+
+    int closeInd = currFileInd;
+    // If last tab is going to be closed, prepare new blank tab
+    if (subtitleApp.getFilesCo() == 1) actionNew();
+
+    subtitleApp.closeFile(closeInd);
+    ui->tabWidget->removeTab(closeInd);
     status("File closed!");
+
+    // Always jump to the first tab
+    changeContext(0);
 }
 
 void MainWindow::updateWindowTitle()
 {
-    this->setWindowTitle(PROGRAM_TITLE + " | " +
-                         currentFile->getFilePath());
+    QString title = PROGRAM_TITLE + " | " +
+                currentFile->getFilePath();
+    if (currentFile->isEdited()) title += " *";
+    this->setWindowTitle(title);
 }
 
 void MainWindow::status(const QString &message)
@@ -256,10 +245,12 @@ void MainWindow::on_FPSDoubleSpinBox_valueChanged()
     ui->FPSlabel->setText("Current FPS:*");
 }
 
+// edit is responsibility of subtitle proccessor
 void MainWindow::on_FPSDoubleSpinBox_editingFinished()
 {
     ui->FPSlabel->setText("Current FPS:");
     currentFile->setFPS(ui->FPSDoubleSpinBox->value());
+    updateWindowTitle();
 }
 
 void MainWindow::on_editButton_clicked()
@@ -267,15 +258,10 @@ void MainWindow::on_editButton_clicked()
     actionEdit();
 }
 
-void MainWindow::on_tableView_doubleClicked()
-{
-    actionEdit();
-}
-
 void MainWindow::on_searchLineEdit_editingFinished()
 {
-    searchPhrase = ui->searchLineEdit->text();
-    refreshTitleList();
+    currTab->setSearhPhrase(ui->searchLineEdit->text());
+    currTab->refreshTitleList();
 }
 
 void MainWindow::on_actionOpen_File_triggered()
@@ -334,10 +320,12 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    changeContext(index);
+    // change only if different tab is selected
+    if (index != currFileInd)
+        changeContext(index);
 }
 
 void MainWindow::on_actionNew_File_triggered()
 {
-    subtitleApp.newTitle();
+    actionNew();
 }

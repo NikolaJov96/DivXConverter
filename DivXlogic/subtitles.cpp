@@ -24,9 +24,17 @@ FORMATS Subtitles::getFormat() const { return fileType; }
 
 bool Subtitles::isEdited() const { return edited; }
 
-void Subtitles::setFPS(double fps) { FPS = fps; }
+void Subtitles::setFPS(double fps) {
+    if (fps == FPS) return;
+    FPS = fps;
+    edited = true;
+}
 
-void Subtitles::setFilePath(const QString &path) { filePath = path; }
+void Subtitles::setFilePath(const QString &path) {
+    if (filePath == path) return;
+    filePath = path;
+    edited = true;
+}
 
 void Subtitles::setFormat(FORMATS format) { fileType = format; }
 
@@ -54,4 +62,5 @@ void Subtitles::addSubTitle(Subtitle *sub)
                           [](const Subtitle *a, const Subtitle *b) -> bool {
                     return a->getStart() < b->getStart();
                 });
+    edited = true;
 }
