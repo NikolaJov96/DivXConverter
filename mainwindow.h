@@ -26,9 +26,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);       /*!< Default constructor */
-    ~MainWindow();
+    ~MainWindow();                                  /*!< Default destructor */
 
-    void actionEdit();                              /*!< Edit selected title acton */                                 /*!< Default destructor */
+    void actionEdit();                              /*!< Edit selected title acton */
 
 private slots:
 
@@ -38,7 +38,7 @@ private slots:
 
     void on_saveSubtitleAsButton_clicked();         /*!< Save subtitle as button clicked handler */
 
-    void on_FPSDoubleSpinBox_valueChanged(double);        /*!< FPS spin box value changed handler */
+    void on_FPSDoubleSpinBox_valueChanged(double);  /*!< FPS spin box value changed handler */
 
     void on_FPSDoubleSpinBox_editingFinished();     /*!< FPS spin box editing finished handler */
 
@@ -62,38 +62,43 @@ private slots:
 
     void on_actionSave_triggered();                 /*!< Save menu item clicked handler */
 
-    void on_tabWidget_currentChanged(int index);
+    void on_tabWidget_currentChanged(int index);    /*!< Tab changed */
 
-    void on_actionNew_File_triggered();
+    void on_actionNew_File_triggered();             /*!< New File menu item clicked handler */
 
-    void on_actionAdd_Subtitle_triggered();
+    void on_actionAdd_Subtitle_triggered();         /*!< Add Subtitle menu item clicked handler */
 
-    void on_actionDelete_Subtitle_triggered();
+    void on_actionDelete_Subtitle_triggered();      /*!< Delete Subtitle menu item clicked handler */
 
-    void on_actionShift_Sellection_triggered();
+    void on_actionShift_Sellection_triggered();     /*!< Shift Sellection menu itam clicked handler */
 
-    void on_actionShift_All_triggered();
+    void on_actionShift_All_triggered();            /*!< Shft All menu itam clicked handler */
+
+    void on_actionAuto_Concat_triggered();
+
+    void on_actionAuto_Devide_triggered();
 
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
 
-    SubtitleProcessing *processor = nullptr;                   /*!< Object responsible for title manipulation */
-    Subtitles *currentFile = nullptr;
-    int currFileInd = 0;
+    SubtitleProcessing *processor = nullptr;        /*!< Object responsible for title manipulation */
+    Subtitles *currentFile = nullptr;               /*!< Poiter to the Subtitles of the sellected tab */
+    int currFileInd = 0;                            /*!< Index of the sellected tab */
     TabForm *currTab = nullptr;
 
-    void changeContext(int);
-    void actionNew();
-    void actionLoad();                              /*!< Loading title form file acton */
-    void actionSave();                              /*!< Saving title to file acton */
+    void changeContext(int);                        /*!< Switches to the desited tab (file) */
+    void actionNew();                               /*!< Creates new Subtitles and tab */
+    void actionLoad();                              /*!< Loads title form file to the new tab */
+    void actionSave();                              /*!< Saves title to file */
     void actionSaveAs(
-            FORMATS format = FORMATS::UNDEFINED);   /*!< Saving title - as to file acton */
-    void actionAddSubtitle();
-    void actionClose();                             /*!< Close opened file */
-    void actionDelete();
-    void actionTimeShift(QModelIndexList*);
-
+            FORMATS format = FORMATS::UNDEFINED);   /*!< Performs Save As to file */
+    void actionAddSubtitle();                       /*!< Adds Subtitle to current Subtitles */
+    void actionClose();                             /*!< Closes opened file */
+    void actionDelete();                            /*!< Removes Subtitle from Subtitles */
+    void actionTimeShift(QModelIndexList*);         /*!< Shifts start and end of desired Subtitle */
+    void actionAutoConcat();
+    void actionAutoSplit();
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */

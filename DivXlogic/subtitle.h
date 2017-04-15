@@ -22,7 +22,7 @@ public:
     QString getSStart() const;              /*!< Returns formated start time */
     QString getSEnd() const;                /*!< Returns formated end time */
 
-    bool operator==(const Subtitle&) const;
+    bool operator==(const Subtitle&) const; /*!< Compares two Subtitles */
 private:
     QString text;                           /*!< Text of the subtitle */
     long start;                             /*!< Subtitle start time in ms */

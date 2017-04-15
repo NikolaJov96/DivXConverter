@@ -300,9 +300,34 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
     }
 
     status("*");
+    processor->sort();
     currTab->refreshTitleList();
     updateWindowTitle();
     status("Subtitle(s) shifted!");
+}
+
+void MainWindow::actionAutoConcat()
+{
+    if (processor->autoConcat(1000, 50))
+    {
+        status("*");
+        currTab->refreshTitleList();
+        updateWindowTitle();
+        status("Auto concatenation finished!");
+    }
+    else status("Nothing to be done.");
+}
+
+void MainWindow::actionAutoSplit()
+{
+    if (processor->autoSplit(10000, 50))
+    {
+        status("*");
+        currTab->refreshTitleList();
+        updateWindowTitle();
+        status("Auto split finished!");
+    }
+    else status("Nothing to be done.");
 }
 
 void MainWindow::updateWindowTitle()
@@ -444,4 +469,14 @@ void MainWindow::on_actionShift_Sellection_triggered()
 void MainWindow::on_actionShift_All_triggered()
 {
     actionTimeShift(nullptr);
+}
+
+void MainWindow::on_actionAuto_Concat_triggered()
+{
+    actionAutoConcat();
+}
+
+void MainWindow::on_actionAuto_Devide_triggered()
+{
+    actionAutoSplit();
 }

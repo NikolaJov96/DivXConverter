@@ -20,7 +20,7 @@ class editTitleDialog : public QDialog
 
 public:
     explicit editTitleDialog(Subtitle*, QWidget *parent = 0);   /*!< Constructor with provided Subtitle to edit */
-    ~editTitleDialog();
+    ~editTitleDialog();                                         /*!< Default destructor */
 
 private slots:
     void on_pushButton_2_clicked();                             /*!< Save button - save shanges and close dialog */
@@ -28,7 +28,7 @@ private slots:
     void on_pushButton_clicked();                               /*!< Cancle button - discard changes and close dialog */
 
 private:
-    Ui::editTitleDialog *ui;
+    Ui::editTitleDialog *ui;                                    /*!< User interface interface */
     Subtitle *subtitle;                                         /*!< Pointer to the Subtitle that is being edited */
 };
 

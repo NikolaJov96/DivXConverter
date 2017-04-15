@@ -18,15 +18,15 @@ class SubtitleApp
 public:
     ~SubtitleApp();                                 /*!< Default destructor */
 
-    Subtitles *getSubtitles(int);
-    int getFilesCo();
+    Subtitles *getSubtitles(int);                   /*!< Returns Subtitles* with provided index */
+    int getFilesCo();                               /*!< Returns number of opened Subtitles */
 
-    void newTitle();
+    void newTitle();                                /*!< Adds new blank Subtitles */
     void loadTitle(const QString&,
                    FORMATS, double = DEFAULT_FPS);  /*!< Loads subtitle file with provided path, format and FPS */
     void saveTitle(const QString&, FORMATS, int);   /*!< Saves to file with provided path and format */
     void saveTitle(int);                            /*!< Saves to file with remembered path and format */
-    void closeFile(int);                            /*!< Close opened file */
+    void closeFile(int);                            /*!< Closes opened file */
 private:
     std::vector<Subtitles*> files;                  /*!< Vector of all opened files */
     SRT SRTManager;                                 /*!< Object for SRT format IO */

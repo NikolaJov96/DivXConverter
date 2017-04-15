@@ -12,19 +12,21 @@ const int DEF_SEL_LEN = 1;
 class SubtitleProcessing
 {
 public:
-    SubtitleProcessing(Subtitles*, QWidget*);
+    SubtitleProcessing(Subtitles*, QWidget*);       /*!< Constructor with provided file and parent QWidget */
 
-    bool editTitle(long) const;
-    bool editTitle(const QString&) const;
-    bool addSubtitle() const;
-    bool deleteSubtitle(long) const;
-    bool deleteSubtitle(const QString&) const;
-    bool timeShift(long, long) const;
-    bool timeShift(const QString&, long) const;
-    void autoConcat();
+    void sort() const;
+    bool editTitle(long) const;                     /*!< Edits the title with provided index */
+    bool editTitle(const QString&) const;           /*!< Edits the title with provided start time */
+    bool addSubtitle() const;                       /*!< Adds new Subtitle */
+    bool deleteSubtitle(long) const;                /*!< Deletes subtitle with provided index */
+    bool deleteSubtitle(const QString&) const;      /*!< Deletes subritle with provided start time */
+    bool timeShift(long, long) const;               /*!< Shifts time of appearance for the title */
+    bool timeShift(const QString&, long) const;     /*!< Shifts time of appearance for the title */
+    bool autoConcat(long, long);                    /*!< Automatically merges suitable subtitles */
+    bool autoSplit(long, long);
 private:
-    QWidget *window = nullptr;
-    Subtitles *subs = nullptr;
+    QWidget *window = nullptr;                      /*!< Pointer to the parent window */
+    Subtitles *subs = nullptr;                      /*!< Pointer to the target Subtitles file */
 };
 
 #endif // SUBTITLEPROCESSING_H

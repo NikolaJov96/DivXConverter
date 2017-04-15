@@ -49,6 +49,7 @@ void editTitleDialog::on_pushButton_clicked()
 
     QString text = ui->textEdit->toPlainText();
     while (text.contains("\n\n")) text.replace("\n\n", "\n");
+    if (text.startsWith("\n")) text = text.mid(1, text.length() - 1);
     if (text.endsWith("\n")) text = text.mid(0, text.length() - 1);
     subtitle->getText() = text;
 
