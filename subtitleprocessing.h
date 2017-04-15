@@ -23,7 +23,8 @@ public:
     bool timeShift(long, long) const;               /*!< Shifts time of appearance for the title */
     bool timeShift(const QString&, long) const;     /*!< Shifts time of appearance for the title */
     bool autoConcat(long, long);                    /*!< Automatically merges suitable subtitles */
-    bool autoSplit(long, long);
+    bool autoSplit(long, long);                     /*!< Automatically splits suitable subtitles */
+    bool appendFile(const Subtitles&);
 private:
     QWidget *window = nullptr;                      /*!< Pointer to the parent window */
     Subtitles *subs = nullptr;                      /*!< Pointer to the target Subtitles file */

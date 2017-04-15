@@ -48,3 +48,17 @@ void TimeShiftDialog::on_radioButton_4_toggled(bool checked)
     ui->spinBox_3->setEnabled(checked);
     ui->spinBox_4->setEnabled(checked);
 }
+
+void TimeShiftDialog::on_radioButton_5_toggled(bool checked)
+{
+    ui->groupBox->setEnabled(checked);
+    ui->groupBox_2->setEnabled(checked);
+}
+
+void TimeShiftDialog::on_radioButton_6_toggled(bool checked)
+{
+    ui->spinBox_5->setEnabled(checked);
+    ui->spinBox_6->setEnabled(checked);
+    ui->spinBox_7->setEnabled(checked);
+    ui->spinBox_8->setEnabled(checked);
+}

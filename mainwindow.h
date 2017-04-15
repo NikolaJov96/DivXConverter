@@ -78,6 +78,8 @@ private slots:
 
     void on_actionAuto_Devide_triggered();
 
+    void on_actionConcat_Files_triggered();
+
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
@@ -99,6 +101,7 @@ private:
     void actionTimeShift(QModelIndexList*);         /*!< Shifts start and end of desired Subtitle */
     void actionAutoConcat();
     void actionAutoSplit();
+    void actionConcatFiles();
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */

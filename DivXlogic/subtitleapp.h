@@ -19,6 +19,7 @@ public:
     ~SubtitleApp();                                 /*!< Default destructor */
 
     Subtitles *getSubtitles(int);                   /*!< Returns Subtitles* with provided index */
+    std::vector<Subtitles*> &getSubtitles();
     int getFilesCo();                               /*!< Returns number of opened Subtitles */
 
     void newTitle();                                /*!< Adds new blank Subtitles */

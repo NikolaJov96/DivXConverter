@@ -16,13 +16,17 @@ public:
     ~TimeShiftDialog();
 
 private slots:
-    void on_pushButton_2_clicked();
+    void on_pushButton_2_clicked();                 /*!< Canel button clicked */
 
-    void on_radioButton_3_toggled(bool checked);
+    void on_pushButton_clicked();                   /*!< Confirm button clicked */
 
-    void on_radioButton_4_toggled(bool checked);
+    void on_radioButton_3_toggled(bool checked);    /*!< Delta time in secondes radio button */
 
-    void on_pushButton_clicked();
+    void on_radioButton_4_toggled(bool checked);    /*!< Full time format radio button */
+
+    void on_radioButton_5_toggled(bool checked);    /*!< Delta option radio button */
+
+    void on_radioButton_6_toggled(bool checked);    /*!< Absolute time option */
 
 private:
     Ui::TimeShiftDialog *ui;

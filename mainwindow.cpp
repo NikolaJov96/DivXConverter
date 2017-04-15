@@ -330,6 +330,19 @@ void MainWindow::actionAutoSplit()
     else status("Nothing to be done.");
 }
 
+void MainWindow::actionConcatFiles()
+{
+    actionNew();
+    for (auto subs : subtitleApp.getSubtitles())
+        if (subs != currentFile)
+            processor->appendFile(*subs);
+
+    status("*");
+    currTab->refreshTitleList();
+    updateWindowTitle();
+    status("Files concatenated!");
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString title = PROGRAM_TITLE + " | " +
@@ -479,4 +492,9 @@ void MainWindow::on_actionAuto_Concat_triggered()
 void MainWindow::on_actionAuto_Devide_triggered()
 {
     actionAutoSplit();
+}
+
+void MainWindow::on_actionConcat_Files_triggered()
+{
+    actionConcatFiles();
 }

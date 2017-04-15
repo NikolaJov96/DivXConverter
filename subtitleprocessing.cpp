@@ -162,3 +162,19 @@ bool SubtitleProcessing::autoSplit(long maxDuration, long maxLen)
     if (edited) subs->setEdited(true);
     return edited;
 }
+
+bool SubtitleProcessing::appendFile(const Subtitles &append)
+{
+    qInfo() << "asd";
+    long delta = 0;
+    if (!subs->getTitles().empty())
+        delta = subs->getTitles()[
+                subs->getTitles().size() - 1]->getEnd();
+    for (auto sub : append.getTitles())
+        subs->addSubTitle(new Subtitle(
+                              sub->getText(),
+                              sub->getStart() + delta,
+                              sub->getEnd() + delta));
+    subs->setEdited(true);
+    return true;
+}

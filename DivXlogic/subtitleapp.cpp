@@ -11,6 +11,11 @@ Subtitles *SubtitleApp::getSubtitles(int ind)
     return files[ind];
 }
 
+std::vector<Subtitles*> &SubtitleApp::getSubtitles()
+{
+    return files;
+}
+
 int SubtitleApp::getFilesCo() { return files.size(); }
 
 void SubtitleApp::newTitle()
