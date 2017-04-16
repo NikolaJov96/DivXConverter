@@ -165,7 +165,6 @@ bool SubtitleProcessing::autoSplit(long maxDuration, long maxLen)
 
 bool SubtitleProcessing::appendFile(const Subtitles &append)
 {
-    qInfo() << "asd";
     long delta = 0;
     if (!subs->getTitles().empty())
         delta = subs->getTitles()[

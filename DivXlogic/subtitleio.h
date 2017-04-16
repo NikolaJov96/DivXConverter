@@ -13,10 +13,10 @@
 class IOException
 {
 public:
-    IOException(const QString&);
-    virtual QString const &what() const;
+    IOException(const QString&);                    /*!< Constructor with provided file path */
+    virtual QString const &what() const;            /*!< Returns excepotion message */
 protected:
-    QString path;
+    QString path;                                   /*!< File path */
 };
 
 /*!
@@ -29,10 +29,10 @@ class InvalidTimeFormat : public IOException
 {
 public:
     InvalidTimeFormat(const QString &p = "",
-                      long l = -1);
-    QString const &what() const;
+                      long l = -1);                 /*!< Constructor with provided file path and line*/
+    QString const &what() const;                    /*!< Returns excepotion message */
 private:
-    long line;
+    long line;                                      /*!< Line with error */
 };
 
 /*!
@@ -44,8 +44,8 @@ private:
 class CantOpenFile : public IOException
 {
 public:
-    CantOpenFile(const QString&);
-    QString const &what() const;
+    CantOpenFile(const QString&);                   /*!< Constructor with provided file path */
+    QString const &what() const;                    /*!< Returns excepotion message */
 };
 
 /*!
@@ -56,7 +56,7 @@ public:
  */
 enum class FORMATS {UNDEFINED, SRT, MPSub, MicroDVD};
 
-const double DEFAULT_FPS = 25.0;
+const double DEFAULT_FPS = 25.0;        /*!< Default FPS used when not user specified */
 
 #include "subtitles.h"
 

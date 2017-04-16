@@ -1,14 +1,19 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <algorithm>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
 #include <QModelIndexList>
-#include <algorithm>
+
+const int DEFAULT_MAX_DURATION = 10000;
+const int DEFAULT_MAX_DISTANCE = 2000;
+const int DEFAULT_MAX_LENGTH = 50;
 
 #include "edittitledialog.h"
 #include "timeshiftdialog.h"
+#include "autoadjustdialog.h"
 
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     QMainWindow(parent),
@@ -29,8 +34,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
                 subtitleApp.loadTitle(argv[i], format,
                                       ui->iFPSDoubleSpinBox->value());
             }
-            catch (IOException &e) { qInfo() << "asd"; fileE = true; continue; }
-            catch (UndefinedType &e) { qInfo() << "qwe"; contE = true; continue; }
+            catch (IOException &e) { fileE = true; continue; }
+            catch (UndefinedType &e) { contE = true; continue; }
             catch (...) { continue; }
             int ind = subtitleApp.getFilesCo() - 1;
             ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
@@ -56,10 +61,40 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (ui->tabWidget->count() > 1)
+    {
+        switch(QMessageBox::question( this, PROGRAM_TITLE,
+                                       tr("More files are open,\ndiscard and close all?"),
+                                       QMessageBox::Cancel | QMessageBox::Yes,
+                                       QMessageBox::Yes))
+        {
+        case QMessageBox::Yes: event->accept(); break;
+        case QMessageBox::Cancel: event->ignore(); break;
+        }
+    }
+    else if (currentFile->isEdited())
+    {
+        switch (discardChangesDialog()) {
+        case QMessageBox::Save:
+            if (currentFile->getFilePath().length() > 0) actionSave();
+            else actionSaveAs();
+            // merge with Discard case
+        case QMessageBox::Discard:
+            event->accept();
+            break;
+        case QMessageBox::Cancel:
+            event->ignore();
+            break;
+        }
+    }
+}
+
 int MainWindow::discardChangesDialog() const
 {
     QMessageBox msgBox;
-    msgBox.setText("Closing opened subtitle.");
+    msgBox.setText("Closing edited subtitle.");
     msgBox.setInformativeText("Do you want to save the current state?");
     msgBox.setStandardButtons(QMessageBox::Save |
                               QMessageBox::Discard | QMessageBox::Cancel);
@@ -127,10 +162,10 @@ void MainWindow::actionSave()
         status("Whiy save a blank sibtitle?");
         return;
     }
-    // call Save As if file is not initially saved
+    // if file is not initially saved requrst Save As first
     if (currentFile->getFilePath().length() == 0)
     {
-        actionSaveAs();
+        status("Save file initialy with Save As!");
         return;
     }
 
@@ -306,7 +341,7 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
     if (indexes) data = currTab->getTable()->model()->
             data(currTab->getTable()->model()->
                  index(indexes->at(0).row(), 0)).toString();
-    else data = currentFile->getTitles()[0]->getText();
+    else data = currentFile->getTitles()[0]->getSStart();
     long ind = currentFile->indexOf(data);
     TimeShiftDialog dialog(shift, *(currentFile->getTitles()[ind]), this);
     dialog.setModal(true);
@@ -357,7 +392,15 @@ void MainWindow::actionAutoConcat()
         status("Nothing to concat in the empty file.");
         return;
     }
-    if (processor->autoConcat(1000, 50))
+
+    long maxDist = DEFAULT_MAX_DISTANCE,
+            maxLen = DEFAULT_MAX_LENGTH;
+    AutoAdjustDialog dialog("Max title duration: ", "Autoc Concat", maxDist, maxLen, this);
+    dialog.setModal(true);
+    dialog.exec();
+    if (maxDist < 1 || maxLen < 1) return;
+
+    if (processor->autoConcat(maxDist, maxLen))
     {
         status("*");
         currTab->refreshTitleList();
@@ -374,7 +417,15 @@ void MainWindow::actionAutoSplit()
         status("Nothing to split in the empty file.");
         return;
     }
-    if (processor->autoSplit(10000, 50))
+
+    long maxDur = DEFAULT_MAX_DURATION,
+            maxLen = DEFAULT_MAX_LENGTH;
+    AutoAdjustDialog dialog("Max title duration: ", "Auto Devide", maxDur, maxLen, this);
+    dialog.setModal(true);
+    dialog.exec();
+    if (maxDur < 1 || maxLen < 1) return;
+
+    if (processor->autoSplit(maxDur, maxLen))
     {
         status("*");
         currTab->refreshTitleList();
@@ -477,20 +528,6 @@ void MainWindow::on_actionSaveAsMicroDVD_triggered()
 
 void MainWindow::on_actionExit_triggered()
 {
-    if (ui->tabWidget->count() > 1)
-    {
-        // discard all?
-    }
-    else if (currentFile->isEdited())
-    {
-        switch (discardChangesDialog()) {
-        case QMessageBox::Save:
-            if (currentFile->getFilePath().length() > 0) actionSave();
-            else actionSaveAs();
-            break;
-        case QMessageBox::Cancel: return; break;
-        }
-    }
     this->close();
 }
 

@@ -14,8 +14,10 @@ class TimeShiftDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TimeShiftDialog(long&, const Subtitle&, QWidget *parent = 0);
-    ~TimeShiftDialog();
+    explicit TimeShiftDialog(long&, const Subtitle&,
+                             QWidget *parent = 0);  /*!< Constructor with provided parameter reference
+                                                      and initial Subtitle */
+    ~TimeShiftDialog();                             /*!< Default destructor */
 
 private slots:
     void on_pushButton_2_clicked();                 /*!< Canel button clicked */
@@ -31,10 +33,10 @@ private slots:
     void on_radioButton_6_toggled(bool checked);    /*!< Absolute time option */
 
 private:
-    Ui::TimeShiftDialog *ui;
+    Ui::TimeShiftDialog *ui;                        /*!< User interface interface */
 
-    const Subtitle &initial;
-    long &shift;
+    const Subtitle &initial;                        /*!< Initial Subtitle */
+    long &shift;                                    /*!< Ms to shift */
 };
 
 #endif // TIMESHIFTDIALOG_H

@@ -104,6 +104,6 @@ void TabForm::refreshTitleList()
 
 void TabForm::on_tableView_doubleClicked(const QModelIndex &index)
 {
-    qInfo() << "Double click";
+    // not working properly
     static_cast<MainWindow*>(parent())->actionEdit();
 }

@@ -16,7 +16,7 @@ class Subtitles;
 class Subtitles
 {
 public:
-    ~Subtitles();
+    ~Subtitles();                                       /*!< Clearing of the Subtitle vector */
 
     std::vector<Subtitle*> &getTitles();                /*!< Returns reference to Subtitle* vector */
     std::vector<Subtitle*> const &getTitles() const;    /*!< Returns const reference to Subtitle* vector */

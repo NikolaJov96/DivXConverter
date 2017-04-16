@@ -3,8 +3,9 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QCloseEvent>
 
-const QString PROGRAM_TITLE = "DivX Converter";
+const QString PROGRAM_TITLE = "DivX Converter";     /*!< Program title */
 
 #include "DivXlogic/subtitleapp.h"
 #include "DivXlogic/subtitleio.h"
@@ -74,11 +75,11 @@ private slots:
 
     void on_actionShift_All_triggered();            /*!< Shft All menu itam clicked handler */
 
-    void on_actionAuto_Concat_triggered();
+    void on_actionAuto_Concat_triggered();          /*!< Auto Concat menu item clicked handler */
 
-    void on_actionAuto_Devide_triggered();
+    void on_actionAuto_Devide_triggered();          /*!< Auto Devide menu item clicked handler */
 
-    void on_actionConcat_Files_triggered();
+    void on_actionConcat_Files_triggered();         /*!< Concat Files menu item clicked handler */
 
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
@@ -87,8 +88,9 @@ private:
     SubtitleProcessing *processor = nullptr;        /*!< Object responsible for title manipulation */
     Subtitles *currentFile = nullptr;               /*!< Poiter to the Subtitles of the sellected tab */
     int currFileInd = 0;                            /*!< Index of the sellected tab */
-    TabForm *currTab = nullptr;
+    TabForm *currTab = nullptr;                     /*!< Pointer to the current tab in tabWidget */
 
+    void closeEvent(QCloseEvent*);                  /*!< Overrides QMainWindow method for closing the window */
     void changeContext(int);                        /*!< Switches to the desited tab (file) */
     void actionNew();                               /*!< Creates new Subtitles and tab */
     void actionLoad();                              /*!< Loads title form file to the new tab */
@@ -99,9 +101,9 @@ private:
     void actionClose();                             /*!< Closes opened file */
     void actionDelete();                            /*!< Removes Subtitle from Subtitles */
     void actionTimeShift(QModelIndexList*);         /*!< Shifts start and end of desired Subtitle */
-    void actionAutoConcat();
-    void actionAutoSplit();
-    void actionConcatFiles();
+    void actionAutoConcat();                        /*!< Concats suitable titles */
+    void actionAutoSplit();                         /*!< Splits suitable titles */
+    void actionConcatFiles();                       /*!< Concats all opened files to the new one */
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */

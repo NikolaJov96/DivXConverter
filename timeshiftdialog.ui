@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Time Shift</string>
   </property>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
@@ -312,14 +312,6 @@
      </rect>
     </property>
    </widget>
-   <zorder>spinBox_8</zorder>
-   <zorder>spinBox_7</zorder>
-   <zorder>spinBox_6</zorder>
-   <zorder>spinBox_5</zorder>
-   <zorder>spinBox_5</zorder>
-   <zorder>spinBox_7</zorder>
-   <zorder>spinBox_6</zorder>
-   <zorder>spinBox_8</zorder>
   </widget>
  </widget>
  <tabstops>

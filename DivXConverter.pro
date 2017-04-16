@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     edittitledialog.cpp \
     subtitleprocessing.cpp \
     tabform.cpp \
-    timeshiftdialog.cpp
+    timeshiftdialog.cpp \
+    autoadjustdialog.cpp
 
 HEADERS  += mainwindow.h \
     DivXlogic/subtitleapp.h \
@@ -45,9 +46,11 @@ HEADERS  += mainwindow.h \
     edittitledialog.h \
     subtitleprocessing.h \
     tabform.h \
-    timeshiftdialog.h
+    timeshiftdialog.h \
+    autoadjustdialog.h
 
 FORMS    += mainwindow.ui \
     edittitledialog.ui \
     tabform.ui \
-    timeshiftdialog.ui
+    timeshiftdialog.ui \
+    autoadjustdialog.ui

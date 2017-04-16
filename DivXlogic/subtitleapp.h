@@ -15,10 +15,10 @@
 class UndefinedType
 {
 public:
-    UndefinedType(const QString&);
-    QString const &what() const;
+    UndefinedType(const QString&);                  /*! Constructor with provided file path */
+    QString const &what() const;                    /*! Returns exception message */
 private:
-    QString path;
+    QString path;                                   /*! File path */
 };
 
 /*!
@@ -34,7 +34,7 @@ public:
     ~SubtitleApp();                                 /*!< Default destructor */
 
     Subtitles *getSubtitles(int);                   /*!< Returns Subtitles* with provided index */
-    std::vector<Subtitles*> &getSubtitles();
+    std::vector<Subtitles*> &getSubtitles();        /*!< Returns reference to the vector of Subtitles */
     int getFilesCo();                               /*!< Returns number of opened Subtitles */
 
     void newTitle();                                /*!< Adds new blank Subtitles */
