@@ -5,6 +5,32 @@
 #include <QDebug>
 #include <QRegExp>
 
+IOException::IOException(const QString &p) :
+    path(p) {}
+
+QString const &IOException::what() const
+{
+    return "Error while reading file: " + path;
+}
+
+InvalidTimeFormat::InvalidTimeFormat(
+        const QString &p, long l) :
+    IOException(p),
+    line(l) {}
+
+QString const &InvalidTimeFormat::what() const
+{
+    return "Invalid time format in line: " + QString::number(line) + " in file: " + path;
+}
+
+CantOpenFile::CantOpenFile(const QString &p) :
+    IOException(p) {}
+
+QString const &CantOpenFile::what() const
+{
+    return "Unable to open file: " + path;
+}
+
 FORMATS SubtitleIO::detect(const QString &path)
 {
     // detect subtitle file format
@@ -12,10 +38,8 @@ FORMATS SubtitleIO::detect(const QString &path)
 
     QFile inFile(path);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        qInfo() << "Unable to open file!\n" << path << "\n";
-        return FORMATS::UNDEFINED;
-    }
+        throw CantOpenFile(path);
+
     QTextStream inStream(&inFile);
     QString line;
     while (!inStream.atEnd() &&

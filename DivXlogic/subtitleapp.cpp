@@ -1,5 +1,13 @@
 #include "subtitleapp.h"
 
+UndefinedType::UndefinedType(const QString &p) :
+    path(p) {}
+
+QString const &UndefinedType::what() const
+{
+    return "Undefined type for opening file: " + path;
+}
+
 SubtitleApp::~SubtitleApp()
 {
     for (auto file : files) delete file;
@@ -26,7 +34,8 @@ void SubtitleApp::newTitle()
 void SubtitleApp::loadTitle(const QString &path,
                             FORMATS format, double fps)
 {
-    if (format == FORMATS::UNDEFINED) { /* throw unable to load */ }
+    if (format == FORMATS::UNDEFINED) throw UndefinedType(path);
+
     Subtitles *subs = new Subtitles();
     try
     {
@@ -35,7 +44,7 @@ void SubtitleApp::loadTitle(const QString &path,
     catch (...)
     {
         delete subs;
-        /* throw unable to load */
+        throw;
     }
     subs->setFilePath(path);
     subs->setFormat(format);
@@ -47,12 +56,12 @@ void SubtitleApp::loadTitle(const QString &path,
 void SubtitleApp::saveTitle(const QString &path, FORMATS format, int ind)
 {
     if (format == FORMATS::UNDEFINED ||
-            ind < 0 || ind >= files.size()) { /* throw unable to save */ }
+            ind < 0 || ind >= files.size()) throw UndefinedType(path);
     try
     {
         getIOManager(format)->saveTitle(*files[ind], path);
     }
-    catch (...) { /* throw unable to save */ return; }
+    catch (...) { throw; }
     files[ind]->setFilePath(path);
     files[ind]->setFormat(format);
     files[ind]->setEdited(false);
@@ -60,7 +69,7 @@ void SubtitleApp::saveTitle(const QString &path, FORMATS format, int ind)
 
 void SubtitleApp::saveTitle(int ind)
 {
-    if (ind < 0 || ind >= files.size()) { /* throw unable to save */ };
+    if (ind < 0 || ind >= files.size()) return;
     saveTitle(files[ind]->getFilePath(),
               files[ind]->getFormat(), ind);
 }

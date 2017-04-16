@@ -7,6 +7,21 @@
 #include "subtitles.h"
 
 /*!
+ * \brief The UndefinedType class
+ *
+ * Exception thrown when opening or saving
+ * without specified file format
+ */
+class UndefinedType
+{
+public:
+    UndefinedType(const QString&);
+    QString const &what() const;
+private:
+    QString path;
+};
+
+/*!
  * \brief The SubtitleApp class
  *
  * Class that contains all of the information about

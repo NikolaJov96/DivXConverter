@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <DivXlogic/subtitle.h>
+
 namespace Ui {
 class TimeShiftDialog;
 }
@@ -12,7 +14,7 @@ class TimeShiftDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TimeShiftDialog(long&, QWidget *parent = 0);
+    explicit TimeShiftDialog(long&, const Subtitle&, QWidget *parent = 0);
     ~TimeShiftDialog();
 
 private slots:
@@ -31,6 +33,7 @@ private slots:
 private:
     Ui::TimeShiftDialog *ui;
 
+    const Subtitle &initial;
     long &shift;
 };
 

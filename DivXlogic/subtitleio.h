@@ -1,7 +1,52 @@
 #ifndef SUBTITLEIO_H
 #define SUBTITLEIO_H
 
+#include <exception>
 #include <QString>
+
+/*!
+ * \brief The IOException class
+ *
+ * Exception thrown for unsuccessful
+ * IO operations
+ */
+class IOException
+{
+public:
+    IOException(const QString&);
+    virtual QString const &what() const;
+protected:
+    QString path;
+};
+
+/*!
+ * \brief The InvalidTimeFormat class
+ *
+ * Exception thrown on invalid time
+ * format while loading file
+ */
+class InvalidTimeFormat : public IOException
+{
+public:
+    InvalidTimeFormat(const QString &p = "",
+                      long l = -1);
+    QString const &what() const;
+private:
+    long line;
+};
+
+/*!
+ * \brief The CantOpenFile class
+ *
+ * Exception thrown on unsuccessful
+ * opening of the file
+ */
+class CantOpenFile : public IOException
+{
+public:
+    CantOpenFile(const QString&);
+    QString const &what() const;
+};
 
 /*!
  * \brief The FORMATS enum

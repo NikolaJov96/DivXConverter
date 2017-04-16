@@ -4,18 +4,15 @@
 #include <QDebug>
 #include <QFile>
 
-void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
+void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
 {
     // load text file in MPSub format form path p
     // parse it and store to subs
 
-    QFile inFile(p);
+    QFile inFile(path);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        // throw unable to open file
-        qInfo() << "Unable to open file!\n" << p << "\n";
-        return;
-    }
+        throw CantOpenFile(path);
+
     subs.setFPS(fps);
     QTextStream inStream(&inFile);
     QString time, data, nextLine;
@@ -31,7 +28,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
                (time.length() == 0 || time.startsWith("#")))
             time = inStream.readLine();
         if (inStream.atEnd() && time.length() > 0)
-        { qInfo() << "Invalid file!\n"; /* throw invalid file */ }
+            throw IOException(path);
 
         // read and convert start and end time
         while (time.startsWith("#")) time = inStream.readLine();
@@ -42,7 +39,9 @@ void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
             list.append(rx.cap(1));
             pos += rx.matchedLength();
         }
-        if (list.size() != 2) { qInfo() << "Invalid time!\n" << time << "\n"; /* throw invalid time */ }
+        if (list.size() != 2)
+            throw InvalidTimeFormat(path, 123);
+
         double start = timePoint + list[0].toDouble() * 1000;
         double end = start + list[1].toDouble() * 1000;
         timePoint = end;
@@ -64,19 +63,16 @@ void MPSub::loadTitle(Subtitles& subs, const QString&p, double fps) const
     inFile.close();
 }
 
-void MPSub::saveTitle(const Subtitles& subs, const QString&p) const
+void MPSub::saveTitle(const Subtitles &subs, const QString &path) const
 {
     // convert titles from subs to MPSub format
     // remove <i> and <\i> flasgs
     // save it to file with path p
 
-    QFile outFile(p);
+    QFile outFile(path);
     if (!outFile.open(QIODevice::WriteOnly))
-    {
-        qInfo() << "Unable to open file!\n" << p << "\n";
-        return;
-        // throw unable to save file
-    }
+        throw CantOpenFile(path);
+
     QTextStream outStream(&outFile);
     long timePoint = 0;
     for (auto &sub : subs.getTitles())

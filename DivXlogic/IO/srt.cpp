@@ -15,7 +15,7 @@ long SRT::timeToLong(const QString &time) const
         arr[ind++] = rx.cap(1).toLong();
         pos += rx.matchedLength();
     }
-    if (ind != 4) { qInfo() << "Invalid time!\n" << time << "\n"; /* throw invalid time */ }
+    if (ind != 4) { throw InvalidTimeFormat(); }
     return ((arr[0] * 60 + arr[1]) * 60 + arr[2]) * 1000 + arr[3];
 }
 
@@ -28,18 +28,15 @@ QString SRT::longToTime(long ms) const
             QString("%1").arg(ms % 1000, 3, 10, QChar('0'));
 }
 
-void SRT::loadTitle(Subtitles &subs, const QString &p, double fps) const
+void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
 {
     // load text file in SRT format form path p
     // parse it and store to subs
 
-    QFile inFile(p);
+    QFile inFile(path);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        // throw unable to open file
-        qInfo() << "Unable to open file!\n" << p << "\n";
-        return;
-    }
+        throw CantOpenFile(path);
+
     subs.setFPS(fps);
     QTextStream inStream(&inFile);
     QString time, data, nextLine;
@@ -51,12 +48,17 @@ void SRT::loadTitle(Subtitles &subs, const QString &p, double fps) const
         while (!inStream.atEnd() &&
                (time = inStream.readLine()).length() == 0);
         if (inStream.atEnd() && time.length() > 0)
-        { qInfo() << "Invalid file!\n"; /* throw invalid file */ }
+            throw IOException(path);
 
         // read and convert start and end time
         time = inStream.readLine();
-        long start = timeToLong(time.mid(0, 12));
-        long end = timeToLong(time.mid(17));
+        long start, end;
+        try
+        {
+            start = timeToLong(time.mid(0, 12));
+            end = timeToLong(time.mid(17));
+        }
+        catch (InvalidTimeFormat &e) { throw InvalidTimeFormat(path, 123); }
 
         // read title text
         data = "";
@@ -81,11 +83,8 @@ void SRT::saveTitle(const Subtitles& subs, const QString &path) const
 
     QFile outFile(path);
     if (!outFile.open(QIODevice::WriteOnly))
-    {
-        qInfo() << "Unable to open file!\n" << path << "\n";
-        return;
-        // throw unable to save file
-    }
+        throw CantOpenFile(path);
+
     QTextStream outStream(&outFile);
     int ID = 0;
     for (auto &sub : subs.getTitles())

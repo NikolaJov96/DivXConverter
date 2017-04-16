@@ -10,19 +10,45 @@
 #include "edittitledialog.h"
 #include "timeshiftdialog.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    subtitleApp.newTitle();
-    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(0)), "new");
+    QString message = "";
+    if (argc > 1)
+    {
+        status("*");
+        FORMATS format;
+        bool fileE = false, contE = false;
+        for (int i = 1; i < argc; i++)
+        {
+            try {
+                format = SubtitleIO::detect(argv[i]);
+                subtitleApp.loadTitle(argv[i], format,
+                                      ui->iFPSDoubleSpinBox->value());
+            }
+            catch (IOException &e) { qInfo() << "asd"; fileE = true; continue; }
+            catch (UndefinedType &e) { qInfo() << "qwe"; contE = true; continue; }
+            catch (...) { continue; }
+            int ind = subtitleApp.getFilesCo() - 1;
+            ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+        }
+        if (fileE) message = " - Error while accessing some files!";
+        if (contE) message += " - Error while processing smoe files!";
+    }
+    if (argc == 1 || subtitleApp.getFilesCo() == 0)
+    {
+        subtitleApp.newTitle();
+        ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(0)), "new");
+    }
+
     // remove initial tab
     ui->tabWidget->removeTab(0);
     currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
     changeContext(0);
-    ui->statusBar->showMessage("Velcome to DivX Converter!");
+    status("Velcome to DivX Converter!" + message);
 }
 
 MainWindow::~MainWindow()
@@ -84,11 +110,10 @@ void MainWindow::actionLoad()
         subtitleApp.loadTitle(path, format,
                               ui->iFPSDoubleSpinBox->value());
     }
-    catch (...)
-    {
-        status("Unable to load file! - " + path);
-        return;
-    }
+    catch (IOException &e) { status(e.what()); return; }
+    catch (UndefinedType &e) { status(e.what()); return; }
+    catch (...) { status("Unexpected error."); return; }
+
     int ind = subtitleApp.getFilesCo() - 1;
     ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
     changeContext(ind);
@@ -97,6 +122,11 @@ void MainWindow::actionLoad()
 
 void MainWindow::actionSave()
 {
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Whiy save a blank sibtitle?");
+        return;
+    }
     // call Save As if file is not initially saved
     if (currentFile->getFilePath().length() == 0)
     {
@@ -106,12 +136,9 @@ void MainWindow::actionSave()
 
     status("*");
     try { subtitleApp.saveTitle(currFileInd); }
-    catch (...)
-    {
-        status("Unable do save file! - " +
-               currentFile->getFilePath());
-        return;
-    }
+    catch (IOException &e) { status(e.what()); return; }
+    catch (UndefinedType &e) { status(e.what()); return; }
+    catch (...) { status("Unexpected error."); return; }
     currentFile->setEdited(false);
     updateWindowTitle();
     status("File saved! - " +
@@ -120,6 +147,12 @@ void MainWindow::actionSave()
 
 void MainWindow::actionSaveAs(FORMATS format)
 {
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Whiy save a blank sibtitle?");
+        return;
+    }
+
     // Get saving format if none is provided
     if (format == FORMATS::UNDEFINED)
     {
@@ -154,10 +187,10 @@ void MainWindow::actionSaveAs(FORMATS format)
     // Save to new file and change context
     status("*");
     try { subtitleApp.saveTitle(path, format, currFileInd); }
-    catch (...) {
-        status("Unable do save file! - " +
-               currentFile->getFilePath());
-    }
+    catch (IOException &e) { status(e.what()); return; }
+    catch (UndefinedType &e) { status(e.what()); return; }
+    catch (...) { status("Unexpected error."); return; }
+
     updateWindowTitle();
     status("File saved! - " + currentFile->getFilePath());
 }
@@ -256,6 +289,11 @@ void MainWindow::actionDelete()
 
 void MainWindow::actionTimeShift(QModelIndexList *indexes)
 {
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Nothing to shift in the empty table.");
+        return;
+    }
     if (indexes && indexes->count() == 0)
     {
         status("Select rows in table to shift.");
@@ -264,7 +302,13 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
 
     // get delta time
     long shift = 0;
-    TimeShiftDialog dialog(shift, this);
+    QString data;
+    if (indexes) data = currTab->getTable()->model()->
+            data(currTab->getTable()->model()->
+                 index(indexes->at(0).row(), 0)).toString();
+    else data = currentFile->getTitles()[0]->getText();
+    long ind = currentFile->indexOf(data);
+    TimeShiftDialog dialog(shift, *(currentFile->getTitles()[ind]), this);
     dialog.setModal(true);
     dialog.exec();
     if (shift == 0) return;
@@ -273,7 +317,7 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
     {
         if (indexes)
         {
-            QString data = currTab->getTable()->model()->
+            data = currTab->getTable()->model()->
                     data(currTab->getTable()->model()->
                          index(indexes->at(0).row(), 0)).toString();
             if (!processor->timeShift(data, shift)) throw 1;
@@ -308,6 +352,11 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
 
 void MainWindow::actionAutoConcat()
 {
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Nothing to concat in the empty file.");
+        return;
+    }
     if (processor->autoConcat(1000, 50))
     {
         status("*");
@@ -320,6 +369,11 @@ void MainWindow::actionAutoConcat()
 
 void MainWindow::actionAutoSplit()
 {
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Nothing to split in the empty file.");
+        return;
+    }
     if (processor->autoSplit(10000, 50))
     {
         status("*");
@@ -332,6 +386,12 @@ void MainWindow::actionAutoSplit()
 
 void MainWindow::actionConcatFiles()
 {
+    if (subtitleApp.getFilesCo() < 2)
+    {
+        status("Open more files to concat them.");
+        return;
+    }
+
     actionNew();
     for (auto subs : subtitleApp.getSubtitles())
         if (subs != currentFile)

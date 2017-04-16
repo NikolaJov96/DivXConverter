@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);       /*!< Default constructor */
+    explicit MainWindow(int, char**, QWidget *parent = 0);       /*!< Default constructor */
     ~MainWindow();                                  /*!< Default destructor */
 
     void actionEdit();                              /*!< Edit selected title acton */
