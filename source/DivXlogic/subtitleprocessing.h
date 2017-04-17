@@ -7,7 +7,7 @@ const int DEF_CONCAT_DIST = 1000;
 const int DEF_CONCAT_LEN = 1000;
 const int DEF_SEL_LEN = 1;
 
-#include "DivXlogic/subtitles.h"
+#include "subtitles.h"
 
 /*!
  * \brief The SubtitleProcessing class

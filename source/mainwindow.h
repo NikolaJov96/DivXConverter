@@ -9,7 +9,7 @@ const QString PROGRAM_TITLE = "DivX Converter";     /*!< Program title */
 
 #include "DivXlogic/subtitleapp.h"
 #include "DivXlogic/subtitleio.h"
-#include "subtitleprocessing.h"
+#include "DivXlogic/subtitleprocessing.h"
 #include "tabform.h"
 
 namespace Ui {

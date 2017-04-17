@@ -58,7 +58,7 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
             start = timeToLong(time.mid(0, 12));
             end = timeToLong(time.mid(17));
         }
-        catch (InvalidTimeFormat &e) { throw InvalidTimeFormat(path, 123); }
+        catch (InvalidTimeFormat&) { throw InvalidTimeFormat(path, 123); }
 
         // read title text
         data = "";

@@ -8,7 +8,7 @@
 IOException::IOException(const QString &p) :
     path(p) {}
 
-QString const &IOException::what() const
+QString IOException::what() const
 {
     return "Error while reading file: " + path;
 }
@@ -18,7 +18,7 @@ InvalidTimeFormat::InvalidTimeFormat(
     IOException(p),
     line(l) {}
 
-QString const &InvalidTimeFormat::what() const
+QString InvalidTimeFormat::what() const
 {
     return "Invalid time format in line: " + QString::number(line) + " in file: " + path;
 }
@@ -26,7 +26,7 @@ QString const &InvalidTimeFormat::what() const
 CantOpenFile::CantOpenFile(const QString &p) :
     IOException(p) {}
 
-QString const &CantOpenFile::what() const
+QString CantOpenFile::what() const
 {
     return "Unable to open file: " + path;
 }

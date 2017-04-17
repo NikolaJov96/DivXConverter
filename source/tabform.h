@@ -6,7 +6,7 @@
 #include <QTableView>
 
 #include "DivXlogic/subtitles.h"
-#include "subtitleprocessing.h"
+#include "DivXlogic/subtitleprocessing.h"
 
 namespace Ui {
 class TabForm;
@@ -36,7 +36,7 @@ private slots:
             const QModelIndex &index);                  /*!< Inits edit action for selected title */
 
 private:
-    Ui::TabForm *ui;
+    Ui::TabForm *ui;                        /*!< User interface interface */
     QString searchPhrase = "";              /*!< Filter subtitles with this phrase */
     Subtitles *file;                        /*!< Currently selected file form subtitleApp */
     SubtitleProcessing processor;           /*!< Processor for managing associated Subtitles */

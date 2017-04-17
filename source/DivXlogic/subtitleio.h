@@ -1,7 +1,6 @@
 #ifndef SUBTITLEIO_H
 #define SUBTITLEIO_H
 
-#include <exception>
 #include <QString>
 
 /*!
@@ -14,7 +13,7 @@ class IOException
 {
 public:
     IOException(const QString&);                    /*!< Constructor with provided file path */
-    virtual QString const &what() const;            /*!< Returns excepotion message */
+    virtual QString what() const;            /*!< Returns excepotion message */
 protected:
     QString path;                                   /*!< File path */
 };
@@ -30,7 +29,7 @@ class InvalidTimeFormat : public IOException
 public:
     InvalidTimeFormat(const QString &p = "",
                       long l = -1);                 /*!< Constructor with provided file path and line*/
-    QString const &what() const;                    /*!< Returns excepotion message */
+    QString what() const;                           /*!< Returns excepotion message */
 private:
     long line;                                      /*!< Line with error */
 };
@@ -45,7 +44,7 @@ class CantOpenFile : public IOException
 {
 public:
     CantOpenFile(const QString&);                   /*!< Constructor with provided file path */
-    QString const &what() const;                    /*!< Returns excepotion message */
+    QString what() const;                           /*!< Returns excepotion message */
 };
 
 /*!

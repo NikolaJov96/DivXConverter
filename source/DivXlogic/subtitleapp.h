@@ -16,7 +16,7 @@ class UndefinedType
 {
 public:
     UndefinedType(const QString&);                  /*! Constructor with provided file path */
-    QString const &what() const;                    /*! Returns exception message */
+    QString what() const;                           /*! Returns exception message */
 private:
     QString path;                                   /*! File path */
 };

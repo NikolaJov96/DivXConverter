@@ -3,7 +3,7 @@
 UndefinedType::UndefinedType(const QString &p) :
     path(p) {}
 
-QString const &UndefinedType::what() const
+QString UndefinedType::what() const
 {
     return "Undefined type for opening file: " + path;
 }
@@ -24,7 +24,7 @@ std::vector<Subtitles*> &SubtitleApp::getSubtitles()
     return files;
 }
 
-int SubtitleApp::getFilesCo() { return files.size(); }
+int SubtitleApp::getFilesCo() { return (int)files.size(); }
 
 void SubtitleApp::newTitle()
 {

@@ -102,7 +102,7 @@ void TabForm::refreshTitleList()
     }
 }
 
-void TabForm::on_tableView_doubleClicked(const QModelIndex &index)
+void TabForm::on_tableView_doubleClicked(const QModelIndex&)
 {
     // not working properly
     static_cast<MainWindow*>(parent())->actionEdit();

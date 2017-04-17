@@ -23,34 +23,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    DivXlogic/subtitleapp.cpp \
-    DivXlogic/subtitles.cpp \
-    DivXlogic/subtitle.cpp \
-    DivXlogic/subtitleio.cpp \
-    DivXlogic/IO/srt.cpp \
+SOURCES += \
     DivXlogic/IO/microdvd.cpp \
     DivXlogic/IO/mpsub.cpp \
+    DivXlogic/IO/srt.cpp \
+    DivXlogic/subtitle.cpp \
+    DivXlogic/subtitleapp.cpp \
+    DivXlogic/subtitleio.cpp \
+    DivXlogic/subtitles.cpp \
+    autoadjustdialog.cpp \
     edittitledialog.cpp \
-    subtitleprocessing.cpp \
+    main.cpp \
+    mainwindow.cpp \
     tabform.cpp \
     timeshiftdialog.cpp \
-    autoadjustdialog.cpp
+    DivXlogic/subtitleprocessing.cpp
 
-HEADERS  += mainwindow.h \
-    DivXlogic/subtitleapp.h \
-    DivXlogic/subtitles.h \
+HEADERS  += \
     DivXlogic/subtitle.h \
+    DivXlogic/subtitleapp.h \
     DivXlogic/subtitleio.h \
+    DivXlogic/subtitleprocessing.h \
+    autoadjustdialog.h \
     edittitledialog.h \
-    subtitleprocessing.h \
+    mainwindow.h \
     tabform.h \
-    timeshiftdialog.h \
-    autoadjustdialog.h
-
-FORMS    += mainwindow.ui \
+    timeshiftdialog.h
+FORMS    += \
+    autoadjustdialog.ui \
     edittitledialog.ui \
+    mainwindow.ui \
     tabform.ui \
-    timeshiftdialog.ui \
-    autoadjustdialog.ui
+    timeshiftdialog.ui

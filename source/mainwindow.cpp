@@ -34,8 +34,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
                 subtitleApp.loadTitle(argv[i], format,
                                       ui->iFPSDoubleSpinBox->value());
             }
-            catch (IOException &e) { fileE = true; continue; }
-            catch (UndefinedType &e) { contE = true; continue; }
+            catch (IOException&) { fileE = true; continue; }
+            catch (UndefinedType&) { contE = true; continue; }
             catch (...) { continue; }
             int ind = subtitleApp.getFilesCo() - 1;
             ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
@@ -235,7 +235,6 @@ void MainWindow::actionEdit()
     QModelIndexList indexes =
             currTab->getTable()->selectionModel()->
             selection().indexes();
-
 
     // one row - three items
     if (indexes.count() != 3)
@@ -482,7 +481,7 @@ void MainWindow::on_saveSubtitleAsButton_clicked()
     actionSaveAs();
 }
 
-void MainWindow::on_FPSDoubleSpinBox_valueChanged(double val)
+void MainWindow::on_FPSDoubleSpinBox_valueChanged(double)
 {
     ui->FPSlabel->setText("Current FPS:*");
 }
