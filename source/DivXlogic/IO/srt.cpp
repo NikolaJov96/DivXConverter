@@ -8,12 +8,13 @@
 long SRT::timeToLong(const QString &time) const
 {
     // convert string time to ms - format: 01:03:00,900
-    QRegExp rx("([0-9]+)");
+    QRegExp intRX("([0-9]+)");
     long arr[4];
     int pos = 0, ind = 0;
-    while ((pos = rx.indexIn(time, pos)) != -1) {
-        arr[ind++] = rx.cap(1).toLong();
-        pos += rx.matchedLength();
+    while ((pos = intRX.indexIn(time, pos)) != -1) {
+        if (ind > 3) throw InvalidTimeFormat();
+        arr[ind++] = intRX.cap(1).toLong();
+        pos += intRX.matchedLength();
     }
     if (ind != 4) { throw InvalidTimeFormat(); }
     return ((arr[0] * 60 + arr[1]) * 60 + arr[2]) * 1000 + arr[3];
@@ -39,7 +40,9 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
 
     subs.setFPS(fps);
     QTextStream inStream(&inFile);
+    inStream.setCodec("UTF-8");
     QString time, data, nextLine;
+    QRegExp timeMatch ("[0-9]+:[0-9]+:[0-9]+,[0-9]+ +--> +[0-9]+:[0-9]+:[0-9]+,[0-9]+");
     while (!inStream.atEnd())
     {
         // read one block
@@ -52,11 +55,13 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
 
         // read and convert start and end time
         time = inStream.readLine();
+        if (!timeMatch.exactMatch(time)) throw InvalidTimeFormat(path, 1234);
         long start, end;
         try
         {
-            start = timeToLong(time.mid(0, 12));
-            end = timeToLong(time.mid(17));
+            int position = time.toStdString().find("-->");
+            start = timeToLong(time.mid(0, position));
+            end = timeToLong(time.mid(position + 3));
         }
         catch (InvalidTimeFormat&) { throw InvalidTimeFormat(path, 123); }
 
@@ -86,6 +91,8 @@ void SRT::saveTitle(const Subtitles& subs, const QString &path) const
         throw CantOpenFile(path);
 
     QTextStream outStream(&outFile);
+    outStream.setCodec("UTF-8");
+
     int ID = 0;
     for (auto &sub : subs.getTitles())
     {

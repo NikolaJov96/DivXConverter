@@ -48,7 +48,8 @@ HEADERS  += \
     edittitledialog.h \
     mainwindow.h \
     tabform.h \
-    timeshiftdialog.h
+    timeshiftdialog.h \
+    DivXlogic/subtitles.h
 FORMS    += \
     autoadjustdialog.ui \
     edittitledialog.ui \

@@ -81,6 +81,8 @@ private slots:
 
     void on_actionConcat_Files_triggered();         /*!< Concat Files menu item clicked handler */
 
+    void on_actionAbout_File_triggered();
+
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
     SubtitleApp subtitleApp;                        /*!< SubtitleApp core application object */
@@ -104,6 +106,7 @@ private:
     void actionAutoConcat();                        /*!< Concats suitable titles */
     void actionAutoSplit();                         /*!< Splits suitable titles */
     void actionConcatFiles();                       /*!< Concats all opened files to the new one */
+    void actionAbout();                             /*!< Displays information about opened file */
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */

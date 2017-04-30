@@ -63,12 +63,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (ui->tabWidget->count() > 1)
+    // If none of the opened files are edited, just close
+    bool someEdited = false;
+    for (auto &file : subtitleApp.getSubtitles())
+        someEdited |= file->isEdited();
+
+    if (!someEdited) event->accept();
+    else if (ui->tabWidget->count() > 1)
     {
-        switch(QMessageBox::question( this, PROGRAM_TITLE,
-                                       tr("More files are open,\ndiscard and close all?"),
-                                       QMessageBox::Cancel | QMessageBox::Yes,
-                                       QMessageBox::Yes))
+        switch(QMessageBox::question(this, PROGRAM_TITLE,
+                                     tr("More files are open,\ndiscard and close all?"),
+                                     QMessageBox::Cancel | QMessageBox::Yes,
+                                     QMessageBox::Yes))
         {
         case QMessageBox::Yes: event->accept(); break;
         case QMessageBox::Cancel: event->ignore(); break;
@@ -80,7 +86,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         case QMessageBox::Save:
             if (currentFile->getFilePath().length() > 0) actionSave();
             else actionSaveAs();
-            // merge with Discard case
+            // merge with Discard case (no break)
         case QMessageBox::Discard:
             event->accept();
             break;
@@ -127,6 +133,14 @@ void MainWindow::actionNew()
     int ind = subtitleApp.getFilesCo() - 1;
     ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
     changeContext(ind);
+
+    // If there is only one opened blank subtitle, close it
+    if (subtitleApp.getSubtitles().size() == 2 &&
+            subtitleApp.getSubtitles(0)->getTitles().size() == 0)
+    {
+        subtitleApp.closeFile(0);
+        ui->tabWidget->removeTab(0);
+    }
 }
 
 void MainWindow::actionLoad()
@@ -152,6 +166,15 @@ void MainWindow::actionLoad()
     int ind = subtitleApp.getFilesCo() - 1;
     ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
     changeContext(ind);
+
+    // If there is only one opened blank subtitle, close it
+    if (subtitleApp.getSubtitles().size() == 2 &&
+            subtitleApp.getSubtitles(0)->getTitles().size() == 0)
+    {
+        subtitleApp.closeFile(0);
+        ui->tabWidget->removeTab(0);
+    }
+
     status("File loaded! - " + path);
 }
 
@@ -285,9 +308,12 @@ void MainWindow::actionClose()
     int closeInd = currFileInd;
     // If last tab is going to be closed, prepare new blank tab
     if (subtitleApp.getFilesCo() == 1) actionNew();
-
-    subtitleApp.closeFile(closeInd);
-    ui->tabWidget->removeTab(closeInd);
+    // If actionNew didn't close file, close it
+    if (subtitleApp.getFilesCo() > 1)
+    {
+        subtitleApp.closeFile(closeInd);
+        ui->tabWidget->removeTab(closeInd);
+    }
     status("File closed!");
 
     // Always jump to the first tab
@@ -453,6 +479,33 @@ void MainWindow::actionConcatFiles()
     status("Files concatenated!");
 }
 
+void MainWindow::actionAbout()
+{
+    QString message = "";
+    if (currentFile->getFormat() == FORMATS::UNDEFINED)
+        message = "No associated file with selected tab!";
+    else
+    {
+        QString duration = currentFile->getTitles().back()->getSEnd();
+        QString format = "SubRip";
+        switch (currentFile->getFormat())
+        {
+        case FORMATS::MicroDVD: format = "MicroDVD"; break;
+        case FORMATS::MPSub: format = "MPSub"; break;
+        }
+        QString subtitleCo = QString::number(currentFile->getTitles().size());
+        QString size = "123";
+        message = "Information abot \nselected file:\n\n"
+                "Duration:\t" + duration + "\n"
+                "Format:\t" + format + "\n"
+                "Subtitles:\t" + subtitleCo + "\n"
+                "Size:\t\t" + size;
+    }
+    QMessageBox msgBox;
+    msgBox.setText(message);
+    msgBox.exec();
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString title = PROGRAM_TITLE + " | " +
@@ -593,4 +646,9 @@ void MainWindow::on_actionAuto_Devide_triggered()
 void MainWindow::on_actionConcat_Files_triggered()
 {
     actionConcatFiles();
+}
+
+void MainWindow::on_actionAbout_File_triggered()
+{
+    actionAbout();
 }

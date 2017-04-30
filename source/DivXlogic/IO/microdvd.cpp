@@ -18,9 +18,10 @@ void MicroDVD::loadTitle(Subtitles &subs, const QString &path, double fps) const
 
     subs.setFPS(fps);
     QTextStream inStream(&inFile);
+    inStream.setCodec("UTF-8");
     QString row;
     QStringList list;
-    QRegExp rx("\\{([0-9]+)\\}");
+    QRegExp timeRX("\\{([0-9]+)\\}");
     while (!inStream.atEnd())
     {
         // read one block
@@ -29,9 +30,9 @@ void MicroDVD::loadTitle(Subtitles &subs, const QString &path, double fps) const
 
         int pos = 0, pos1;
         list.clear();
-        while ((pos = rx.indexIn(row, pos)) != -1) {
-            list.append(rx.cap(1));
-            pos1 = pos += rx.matchedLength();
+        while ((pos = timeRX.indexIn(row, pos)) != -1) {
+            list.append(timeRX.cap(1));
+            pos1 = pos += timeRX.matchedLength();
         }
         if (list.size() != 2)
             throw InvalidTimeFormat(path, 123);
@@ -57,6 +58,7 @@ void MicroDVD::saveTitle(const Subtitles &subs, const QString &path) const
         throw CantOpenFile(path);
 
     QTextStream outStream(&outFile);
+    outStream.setCodec("UTF-8");
     for (auto &sub : subs.getTitles())
     {
         // convert and write time and data

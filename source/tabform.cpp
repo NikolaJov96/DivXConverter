@@ -50,11 +50,11 @@ void TabForm::setFile(Subtitles *subs) { file = subs; }
 
 void TabForm::updateTitle()
 {
-    QRegExp rx("[/\\\\](.*)$");
-    rx.indexIn(file->getFilePath());
-    QString title = rx.cap(1);
+    QRegExp fileNameRX("[/\\\\](.*)$");
+    fileNameRX.indexIn(file->getFilePath());
+    QString title = fileNameRX.cap(1);
     if (file->isEdited()) title += "*";
-    setWindowTitle(title);
+    // set tab title to title
 }
 
 void TabForm::refreshTitleList()

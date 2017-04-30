@@ -15,6 +15,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
 
     subs.setFPS(fps);
     QTextStream inStream(&inFile);
+    inStream.setCodec("UTF-8");
     QString time, data, nextLine;
     double timePoint = 0;
     QStringList list;
@@ -32,12 +33,12 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
 
         // read and convert start and end time
         while (time.startsWith("#")) time = inStream.readLine();
-        QRegExp rx("([^ ]+)");
+        QRegExp timeRX("([^ ]+)");
         int pos = 0;
         list.clear();
-        while ((pos = rx.indexIn(time, pos)) != -1) {
-            list.append(rx.cap(1));
-            pos += rx.matchedLength();
+        while ((pos = timeRX.indexIn(time, pos)) != -1) {
+            list.append(timeRX.cap(1));
+            pos += timeRX.matchedLength();
         }
         if (list.size() != 2)
             throw InvalidTimeFormat(path, 123);
@@ -74,6 +75,7 @@ void MPSub::saveTitle(const Subtitles &subs, const QString &path) const
         throw CantOpenFile(path);
 
     QTextStream outStream(&outFile);
+    outStream.setCodec("UTF-8");
     long timePoint = 0;
     for (auto &sub : subs.getTitles())
     {
