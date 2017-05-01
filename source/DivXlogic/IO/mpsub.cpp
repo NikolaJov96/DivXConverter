@@ -17,6 +17,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
     QTextStream inStream(&inFile);
     inStream.setCodec("UTF-8");
     QString time, data, nextLine;
+    long line = 0;
     double timePoint = 0;
     QStringList list;
     while (!inStream.atEnd())
@@ -27,12 +28,12 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
         time = "";
         while (!inStream.atEnd() &&
                (time.length() == 0 || time.startsWith("#")))
-            time = inStream.readLine();
+            time = inStream.readLine(), line++;
         if (inStream.atEnd() && time.length() > 0)
             throw IOException(path);
 
         // read and convert start and end time
-        while (time.startsWith("#")) time = inStream.readLine();
+        while (time.startsWith("#")) time = inStream.readLine(), line++;
         QRegExp timeRX("([^ ]+)");
         int pos = 0;
         list.clear();
@@ -41,7 +42,7 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
             pos += timeRX.matchedLength();
         }
         if (list.size() != 2)
-            throw InvalidTimeFormat(path, 123);
+            throw InvalidTimeFormat(path, line);
 
         double start = timePoint + list[0].toDouble() * 1000;
         double end = start + list[1].toDouble() * 1000;
@@ -52,10 +53,12 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
         while (!inStream.atEnd() &&
                (nextLine = inStream.readLine()).length() > 0)
         {
+            line++;
             if (nextLine.startsWith("#")) continue;
             if (data.length() > 0) data.append("\n");
             data.append(nextLine);
         }
+        line++;
 
         // add title to
         Subtitle *newTitle = new Subtitle(data, start, end);

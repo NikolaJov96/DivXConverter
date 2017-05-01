@@ -14,12 +14,14 @@ const int DEFAULT_MAX_LENGTH = 50;
 #include "edittitledialog.h"
 #include "timeshiftdialog.h"
 #include "autoadjustdialog.h"
+#include "tabform.h"
 
-MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
+MainWindow::MainWindow(int argc, char** argv, QMainWindow *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setFixedSize(QSize(842, 441));
 
     QString message = "";
     if (argc > 1)
@@ -37,8 +39,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
             catch (IOException&) { fileE = true; continue; }
             catch (UndefinedType&) { contE = true; continue; }
             catch (...) { continue; }
-            int ind = subtitleApp.getFilesCo() - 1;
-            ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+            currFileInd = subtitleApp.getFilesCo(); // TabForm::UpdateTitle uses currFileInd
+            ui->tabWidget->addTab(new TabForm(
+                                      subtitleApp.getSubtitles(currFileInd - 1), this), "new");
+            // currFileInd + 1 tab - 0th is the initial blank tab
+            static_cast<TabForm*>(ui->tabWidget->widget(currFileInd))->updateTitle();
         }
         if (fileE) message = " - Error while accessing some files!";
         if (contE) message += " - Error while processing smoe files!";
@@ -46,7 +51,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent) :
     if (argc == 1 || subtitleApp.getFilesCo() == 0)
     {
         subtitleApp.newTitle();
-        ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(0)), "new");
+        ui->tabWidget->addTab(new TabForm(
+                                  subtitleApp.getSubtitles(0), this), "new");
     }
 
     // remove initial tab
@@ -131,7 +137,7 @@ void MainWindow::actionNew()
 {
     subtitleApp.newTitle();
     int ind = subtitleApp.getFilesCo() - 1;
-    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind), this), "new");
     changeContext(ind);
 
     // If there is only one opened blank subtitle, close it
@@ -155,7 +161,8 @@ void MainWindow::actionLoad()
     // Load form path
     status("*");
     FORMATS format = SubtitleIO::detect(path);
-    try {
+    try
+    {
         subtitleApp.loadTitle(path, format,
                               ui->iFPSDoubleSpinBox->value());
     }
@@ -164,8 +171,9 @@ void MainWindow::actionLoad()
     catch (...) { status("Unexpected error."); return; }
 
     int ind = subtitleApp.getFilesCo() - 1;
-    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind)), "new");
+    ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind), this), "new");
     changeContext(ind);
+    currTab->updateTitle();
 
     // If there is only one opened blank subtitle, close it
     if (subtitleApp.getSubtitles().size() == 2 &&
@@ -182,7 +190,7 @@ void MainWindow::actionSave()
 {
     if (currentFile->getTitles().size() == 0)
     {
-        status("Whiy save a blank sibtitle?");
+        status("Why save a blank sibtitle?");
         return;
     }
     // if file is not initially saved requrst Save As first
@@ -199,6 +207,7 @@ void MainWindow::actionSave()
     catch (...) { status("Unexpected error."); return; }
     currentFile->setEdited(false);
     updateWindowTitle();
+    currTab->updateTitle();
     status("File saved! - " +
            currentFile->getFilePath());
 }
@@ -250,6 +259,7 @@ void MainWindow::actionSaveAs(FORMATS format)
     catch (...) { status("Unexpected error."); return; }
 
     updateWindowTitle();
+    currTab->updateTitle();
     status("File saved! - " + currentFile->getFilePath());
 }
 
@@ -275,6 +285,7 @@ void MainWindow::actionEdit()
         status("*");
         currTab->refreshTitleList();
         updateWindowTitle();
+        currTab->updateTitle();
         status("Modification applied!");
     }
 }
@@ -407,6 +418,7 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
     processor->sort();
     currTab->refreshTitleList();
     updateWindowTitle();
+    currTab->updateTitle();
     status("Subtitle(s) shifted!");
 }
 
@@ -430,6 +442,7 @@ void MainWindow::actionAutoConcat()
         status("*");
         currTab->refreshTitleList();
         updateWindowTitle();
+        currTab->updateTitle();
         status("Auto concatenation finished!");
     }
     else status("Nothing to be done.");
@@ -455,6 +468,7 @@ void MainWindow::actionAutoSplit()
         status("*");
         currTab->refreshTitleList();
         updateWindowTitle();
+        currTab->updateTitle();
         status("Auto split finished!");
     }
     else status("Nothing to be done.");
@@ -468,7 +482,7 @@ void MainWindow::actionConcatFiles()
         return;
     }
 
-    actionNew();
+    actionNew(); // Changes context to itself
     for (auto subs : subtitleApp.getSubtitles())
         if (subs != currentFile)
             processor->appendFile(*subs);
@@ -476,6 +490,7 @@ void MainWindow::actionConcatFiles()
     status("*");
     currTab->refreshTitleList();
     updateWindowTitle();
+    currTab->updateTitle();
     status("Files concatenated!");
 }
 

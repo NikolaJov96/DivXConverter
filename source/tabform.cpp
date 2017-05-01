@@ -4,10 +4,11 @@
 #include <QStandardItemModel>
 #include <QDebug>
 
-#include "mainwindow.h"
+#include "ui_mainwindow.h"
 
-TabForm::TabForm(Subtitles *subs, QWidget *parent) :
+TabForm::TabForm(Subtitles *subs, MainWindow *parent) :
     QWidget(parent),
+    mainWindow(parent),
     ui(new Ui::TabForm),
     file(subs),
     processor(subs, parent)
@@ -50,11 +51,16 @@ void TabForm::setFile(Subtitles *subs) { file = subs; }
 
 void TabForm::updateTitle()
 {
-    QRegExp fileNameRX("[/\\\\](.*)$");
-    fileNameRX.indexIn(file->getFilePath());
-    QString title = fileNameRX.cap(1);
+    QString title = "new";
+    if (file->getFilePath().length() != 0)
+    {
+        QRegExp fileNameRX("[/\\\\]([^/\\\\]*)$");
+        fileNameRX.indexIn(file->getFilePath());
+        title = fileNameRX.cap(1);
+    }
     if (file->isEdited()) title += "*";
-    // set tab title to title
+    mainWindow->ui->tabWidget->setTabText(
+                mainWindow->currFileInd, title);
 }
 
 void TabForm::refreshTitleList()
@@ -104,6 +110,27 @@ void TabForm::refreshTitleList()
 
 void TabForm::on_tableView_doubleClicked(const QModelIndex&)
 {
-    // not working properly
-    static_cast<MainWindow*>(parent())->actionEdit();
+    QModelIndexList indexes =
+            getTable()->selectionModel()->
+            selection().indexes();
+
+    // one row - three items
+    if (indexes.count() != 3)
+    {
+        static_cast<MainWindow*>(parent())->status("Select one table row to edit.");
+        return;
+    }
+    QString data = getTable()->model()->
+            data(getTable()->model()->
+                 index(indexes.at(0).row(), 0)).toString();
+
+    // refresh GUI only if title is modified
+    if (processor.editTitle(data))
+    {
+        mainWindow->status("*");
+        refreshTitleList();
+        mainWindow->updateWindowTitle();
+        updateTitle();
+        mainWindow->status("Modification applied!");
+    }
 }

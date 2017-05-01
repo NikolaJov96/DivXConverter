@@ -20,15 +20,6 @@ long SRT::timeToLong(const QString &time) const
     return ((arr[0] * 60 + arr[1]) * 60 + arr[2]) * 1000 + arr[3];
 }
 
-QString SRT::longToTime(long ms) const
-{
-    // convert ms to string time - format: 01:03:00,900
-    return QString("%1").arg(ms / 1000 / 60 / 60, 2, 10, QChar('0')) + ":" +
-            QString("%1").arg((ms / 1000 / 60) % 60, 2, 10, QChar('0')) + ":" +
-            QString("%1").arg((ms / 1000) % 60, 2, 10, QChar('0')) + "," +
-            QString("%1").arg(ms % 1000, 3, 10, QChar('0'));
-}
-
 void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
 {
     // load text file in SRT format form path p
@@ -42,6 +33,7 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
     QTextStream inStream(&inFile);
     inStream.setCodec("UTF-8");
     QString time, data, nextLine;
+    long line = 0;
     QRegExp timeMatch ("[0-9]+:[0-9]+:[0-9]+,[0-9]+ +--> +[0-9]+:[0-9]+:[0-9]+,[0-9]+");
     while (!inStream.atEnd())
     {
@@ -49,30 +41,35 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
 
         // read and skip blank lines and title ID
         while (!inStream.atEnd() &&
-               (time = inStream.readLine()).length() == 0);
+               (time = inStream.readLine()).length() == 0)
+            line++;
+        line++;
         if (inStream.atEnd() && time.length() > 0)
             throw IOException(path);
 
         // read and convert start and end time
         time = inStream.readLine();
-        if (!timeMatch.exactMatch(time)) throw InvalidTimeFormat(path, 1234);
+        line++;
+        if (!timeMatch.exactMatch(time)) throw InvalidTimeFormat(path, line);
         long start, end;
         try
         {
-            int position = time.toStdString().find("-->");
+            int position = (int)time.toStdString().find("-->");
             start = timeToLong(time.mid(0, position));
             end = timeToLong(time.mid(position + 3));
         }
-        catch (InvalidTimeFormat&) { throw InvalidTimeFormat(path, 123); }
+        catch (InvalidTimeFormat&) { throw InvalidTimeFormat(path, line); }
 
         // read title text
         data = "";
         while (!inStream.atEnd() &&
                (nextLine = inStream.readLine()).length() > 0)
         {
+            line++;
             if (data.length() > 0) data.append("\n");
             data.append(nextLine);
         }
+        line++;
 
         // add title to
         Subtitle *newTitle = new Subtitle(data, start, end);
@@ -103,9 +100,9 @@ void SRT::saveTitle(const Subtitles& subs, const QString &path) const
         outStream << ++ID << "\n";
 
         // convert and write time
-        outStream << longToTime(sub->getStart())
+        outStream << sub->getSStart()
                   << " --> "
-                  << longToTime(sub->getEnd()) << "\n";
+                  << sub->getSEnd() << "\n";
 
         // write title text
         outStream << sub->getText() << "\n";

@@ -31,6 +31,7 @@ public:
     bool autoConcat(long, long);                    /*!< Automatically merges suitable subtitles */
     bool autoSplit(long, long);                     /*!< Automatically splits suitable subtitles */
     bool appendFile(const Subtitles&);              /*!< Appends provided file to the current one */
+    long isConsistent() const;                      /*!< Chechs if some subtitles are overlapping */
 private:
     QWidget *window = nullptr;                      /*!< Pointer to the parent window */
     Subtitles *subs = nullptr;                      /*!< Pointer to the target Subtitles file */

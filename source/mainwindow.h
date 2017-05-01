@@ -10,11 +10,13 @@ const QString PROGRAM_TITLE = "DivX Converter";     /*!< Program title */
 #include "DivXlogic/subtitleapp.h"
 #include "DivXlogic/subtitleio.h"
 #include "DivXlogic/subtitleprocessing.h"
-#include "tabform.h"
+//#include "tabform.h"
 
 namespace Ui {
 class MainWindow;
 }
+
+class TabForm;
 
 /*!
  * \brief The MainWindow class
@@ -25,11 +27,11 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    explicit MainWindow(int, char**, QWidget *parent = 0);       /*!< Default constructor */
-    ~MainWindow();                                  /*!< Default destructor */
+    friend class TabForm;
 
-    void actionEdit();                              /*!< Edit selected title acton */
+public:
+    explicit MainWindow(int, char**, QMainWindow *parent = 0);       /*!< Default constructor */
+    ~MainWindow();                                  /*!< Default destructor */
 
 private slots:
 
@@ -99,6 +101,7 @@ private:
     void actionSave();                              /*!< Saves title to file */
     void actionSaveAs(
             FORMATS format = FORMATS::UNDEFINED);   /*!< Performs Save As to file */
+    void actionEdit();                              /*!< Edit selected title acton */
     void actionAddSubtitle();                       /*!< Adds Subtitle to current Subtitles */
     void actionClose();                             /*!< Closes opened file */
     void actionDelete();                            /*!< Removes Subtitle from Subtitles */

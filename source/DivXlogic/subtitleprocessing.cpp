@@ -177,3 +177,11 @@ bool SubtitleProcessing::appendFile(const Subtitles &append)
     subs->setEdited(true);
     return true;
 }
+
+long SubtitleProcessing::isConsistent() const
+{
+    for (int i = 0; i < subs->getTitles().size() - 1; i++)
+        if (subs->getTitles()[i]->getEnd() > subs->getTitles()[i+1]->getStart())
+            return i;
+    return -1;
+}

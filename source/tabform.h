@@ -5,6 +5,8 @@
 #include <QStandardItemModel>
 #include <QTableView>
 
+
+#include "mainwindow.h"
 #include "DivXlogic/subtitles.h"
 #include "DivXlogic/subtitleprocessing.h"
 
@@ -17,7 +19,7 @@ class TabForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit TabForm(Subtitles*, QWidget *parent = 0);  /*!< Constructor with provied Subtitles* */
+    explicit TabForm(Subtitles*, MainWindow *parent);   /*!< Constructor with provied Subtitles* */
     ~TabForm();                                         /*!< Defaut destructor */
 
     QString const &getSearchPhrase() const;             /*!< Returns saved search phrase */
@@ -37,6 +39,7 @@ private slots:
 
 private:
     Ui::TabForm *ui;                        /*!< User interface interface */
+    MainWindow *mainWindow;
     QString searchPhrase = "";              /*!< Filter subtitles with this phrase */
     Subtitles *file;                        /*!< Currently selected file form subtitleApp */
     SubtitleProcessing processor;           /*!< Processor for managing associated Subtitles */
