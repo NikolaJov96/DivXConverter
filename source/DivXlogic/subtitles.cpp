@@ -22,6 +22,8 @@ QString const &Subtitles::getFilePath() const
 
 FORMATS Subtitles::getFormat() const { return fileType; }
 
+long Subtitles::getConsistency() const { return consistent; }
+
 bool Subtitles::isEdited() const { return edited; }
 
 void Subtitles::setFPS(double fps) {
@@ -39,6 +41,8 @@ void Subtitles::setFilePath(const QString &path) {
 void Subtitles::setFormat(FORMATS format) { fileType = format; }
 
 void Subtitles::setEdited(bool e) { edited = e; }
+
+void Subtitles::setConsistency(long c) { consistent = c; }
 
 long Subtitles::indexOf(const QString &time) const
 {

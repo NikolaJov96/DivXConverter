@@ -15,18 +15,21 @@ public:
 
     QString &getText();                     /*!< Returns reference to the QString */
     QString const &getText() const;         /*!< Returns const reference to the QString */
-    long &getStart();                       /*!< Returns reference to the start time in ms */
-    long &getEnd();                         /*!< Returns reference to the end time in ms */
     long getStart() const;                  /*!< Returns start time in ms */
     long getEnd() const;                    /*!< Returns end time in ms */
-    QString getSStart() const;              /*!< Returns formated start time */
-    QString getSEnd() const;                /*!< Returns formated end time */
+    QString const &getSStart() const;       /*!< Returns formated start time */
+    QString const &getSEnd() const;         /*!< Returns formated end time */
+
+    void setStart(long);               /*!< Updates subtitle start time */
+    void setEnd(long);                 /*!< Updates subtitle end time */
 
     bool operator==(const Subtitle&) const; /*!< Compares two Subtitles */
 private:
     QString text;                           /*!< Text of the subtitle */
     long start;                             /*!< Subtitle start time in ms */
     long end;                               /*!< Subtitle end time in ms */
+    QString sStart;                         /*!< String reprezentation of the start time */
+    QString sEnd;                           /*!< String reprezentation of the ent time */
 
     QString longToTime(long) const;         /*!< Returns formated timestamp */
 };

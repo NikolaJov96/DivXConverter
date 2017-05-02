@@ -35,17 +35,17 @@ void editTitleDialog::on_pushButton_2_clicked()
 
 void editTitleDialog::on_pushButton_clicked()
 {
-    subtitle->getStart() =
+    subtitle->setStart(
             ((ui->spinBox->value() * 60 +
               ui->spinBox_2->value()) * 60 +
             ui->spinBox_3->value()) * 1000 +
-            ui->spinBox_4->value();
+            ui->spinBox_4->value());
 
-    subtitle->getEnd() =
+    subtitle->setEnd(
             ((ui->spinBox_5->value() * 60 +
               ui->spinBox_6->value()) * 60 +
              ui->spinBox_7->value()) * 1000 +
-            ui->spinBox_8->value();
+            ui->spinBox_8->value());
 
     QString text = ui->textEdit->toPlainText();
     while (text.contains("\n\n")) text.replace("\n\n", "\n");

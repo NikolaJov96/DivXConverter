@@ -15,7 +15,6 @@ TabForm::TabForm(Subtitles *subs, MainWindow *parent) :
 {
     ui->setupUi(this);
     refreshTitleList();
-    updateTitle();
 }
 
 TabForm::~TabForm()
@@ -131,6 +130,7 @@ void TabForm::on_tableView_doubleClicked(const QModelIndex&)
         refreshTitleList();
         mainWindow->updateWindowTitle();
         updateTitle();
+        mainWindow->updateConsLable();
         mainWindow->status("Modification applied!");
     }
 }

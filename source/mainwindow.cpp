@@ -39,9 +39,13 @@ MainWindow::MainWindow(int argc, char** argv, QMainWindow *parent) :
             catch (IOException&) { fileE = true; continue; }
             catch (UndefinedType&) { contE = true; continue; }
             catch (...) { continue; }
-            currFileInd = subtitleApp.getFilesCo(); // TabForm::UpdateTitle uses currFileInd
+            currFileInd = subtitleApp.getFilesCo(); // TabForm::UpdateTitle uses currFileInd;
             ui->tabWidget->addTab(new TabForm(
                                       subtitleApp.getSubtitles(currFileInd - 1), this), "new");
+            subtitleApp.getSubtitles(currFileInd - 1)->setConsistency(
+                        static_cast<TabForm*>(
+                            static_cast<TabForm*>(ui->tabWidget->widget(currFileInd)))->
+                        getProcessor()->isConsistent());
             // currFileInd + 1 tab - 0th is the initial blank tab
             static_cast<TabForm*>(ui->tabWidget->widget(currFileInd))->updateTitle();
         }
@@ -114,7 +118,7 @@ int MainWindow::discardChangesDialog() const
     return msgBox.exec();
 }
 
-void MainWindow::changeContext(int ind)
+void MainWindow::changeContext(int ind, bool checkCons)
 {
     status("*");
     // setup new mainwindow params
@@ -124,12 +128,15 @@ void MainWindow::changeContext(int ind)
     currTab = static_cast<TabForm*> (ui->tabWidget->currentWidget());
     currentFile = currTab->getFile();
     processor = currTab->getProcessor();
+    if (checkCons) // skipped by default
+        currentFile->setConsistency(processor->isConsistent());
 
     // update GUI
     ui->FPSDoubleSpinBox->setValue(currentFile->getFPS());
     ui->searchLineEdit->setText(currTab->getSearchPhrase());
     ui->FPSlabel->setText("Current FPS:");
     updateWindowTitle();
+    updateConsLable();
     status("");
 }
 
@@ -157,6 +164,12 @@ void MainWindow::actionLoad()
                 "Titles (*.srt *.sub *.txt);;All Files(*)");\
     // Retiurn if loading is canceled
     if (path.length() == 0) return;
+    for (auto &file : subtitleApp.getSubtitles())
+        if (file->getFilePath() == path)
+        {
+            status("File already opened!");
+            return;
+        }
 
     // Load form path
     status("*");
@@ -172,8 +185,9 @@ void MainWindow::actionLoad()
 
     int ind = subtitleApp.getFilesCo() - 1;
     ui->tabWidget->addTab(new TabForm(subtitleApp.getSubtitles(ind), this), "new");
-    changeContext(ind);
+    changeContext(ind, true);
     currTab->updateTitle();
+
 
     // If there is only one opened blank subtitle, close it
     if (subtitleApp.getSubtitles().size() == 2 &&
@@ -286,6 +300,7 @@ void MainWindow::actionEdit()
         currTab->refreshTitleList();
         updateWindowTitle();
         currTab->updateTitle();
+        updateConsLable();
         status("Modification applied!");
     }
 }
@@ -419,6 +434,7 @@ void MainWindow::actionTimeShift(QModelIndexList *indexes)
     currTab->refreshTitleList();
     updateWindowTitle();
     currTab->updateTitle();
+    updateConsLable();
     status("Subtitle(s) shifted!");
 }
 
@@ -443,6 +459,7 @@ void MainWindow::actionAutoConcat()
         currTab->refreshTitleList();
         updateWindowTitle();
         currTab->updateTitle();
+        updateConsLable();
         status("Auto concatenation finished!");
     }
     else status("Nothing to be done.");
@@ -469,6 +486,7 @@ void MainWindow::actionAutoSplit()
         currTab->refreshTitleList();
         updateWindowTitle();
         currTab->updateTitle();
+        updateConsLable();
         status("Auto split finished!");
     }
     else status("Nothing to be done.");
@@ -491,6 +509,7 @@ void MainWindow::actionConcatFiles()
     currTab->refreshTitleList();
     updateWindowTitle();
     currTab->updateTitle();
+    updateConsLable();
     status("Files concatenated!");
 }
 
@@ -666,4 +685,14 @@ void MainWindow::on_actionConcat_Files_triggered()
 void MainWindow::on_actionAbout_File_triggered()
 {
     actionAbout();
+}
+
+void MainWindow::updateConsLable()
+{
+    if (currentFile->getConsistency() == -1)
+        ui->ConsLabel->setText("Subtitle is consistent.");
+    else
+        ui->ConsLabel->setText("Inconsistency at title " +
+                               QString::number(currentFile->getConsistency() + 1) +
+                               "!");
 }

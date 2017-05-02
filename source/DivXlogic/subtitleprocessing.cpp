@@ -43,6 +43,7 @@ bool SubtitleProcessing::editTitle(long ind) const
         return a->getStart() < b->getStart();
     });
     subs->setEdited(true);
+    subs->setConsistency(isConsistent());
     return true;
 }
 
@@ -73,6 +74,7 @@ bool SubtitleProcessing::addSubtitle() const
         return a->getStart() < b->getStart();
     });
     subs->setEdited(true);
+    subs->setConsistency(isConsistent());
     return true;
 }
 
@@ -99,9 +101,12 @@ bool SubtitleProcessing::timeShift(long ind, long ms) const
         return false;
     if (subs->getTitles()[ind]->getStart() + ms < 0)
         return false;
-    subs->getTitles()[ind]->getStart() += ms;
-    subs->getTitles()[ind]->getEnd() += ms;
+    subs->getTitles()[ind]->setStart(
+                subs->getTitles()[ind]->getStart() + ms);
+    subs->getTitles()[ind]->setEnd(
+                subs->getTitles()[ind]->getEnd() + ms);
     subs->setEdited(true);
+    subs->setConsistency(isConsistent());
     return true;
 }
 
@@ -122,14 +127,18 @@ bool SubtitleProcessing::autoConcat(long maxDist, long maxLen)
         if (s2->getStart() - s1->getEnd() <= maxDist &&
                 s1->getText().length() + s2->getText().length() <= maxLen)
         {
-            s1->getEnd() = s2->getEnd();
+            s1->setEnd(s2->getEnd());
             s1->getText() += "\n" + s2->getText();
             subs->getTitles().erase(subs->getTitles().begin() + i + 1);
             i--;
             edited = true;
         }
     }
-    if (edited) subs->setEdited(true);
+    if (edited)
+    {
+        subs->setEdited(true);
+        subs->setConsistency(isConsistent());
+    }
     return edited;
 }
 
@@ -148,7 +157,7 @@ bool SubtitleProcessing::autoSplit(long maxDuration, long maxLen)
             long start = s1->getStart() +
                     (s1->getEnd() - s1->getStart()) / 2 - 1;
             Subtitle *s2 = new Subtitle(text, start, s1->getEnd());
-            s1->getEnd() = start - 2;
+            s1->setEnd(start - 2);
             s1->getText() = s1->getText().mid(0, s1->getText().length() / 2);
             if (s1->getText().endsWith("\n"))
                 s1->getText() = s1->getText().mid(0, s1->getText().length() - 1);
@@ -159,7 +168,11 @@ bool SubtitleProcessing::autoSplit(long maxDuration, long maxLen)
             edited = true;
         }
     }
-    if (edited) subs->setEdited(true);
+    if (edited)
+    {
+        subs->setEdited(true);
+        subs->setConsistency(isConsistent());
+    }
     return edited;
 }
 
@@ -175,13 +188,17 @@ bool SubtitleProcessing::appendFile(const Subtitles &append)
                               sub->getStart() + delta,
                               sub->getEnd() + delta));
     subs->setEdited(true);
+    subs->setConsistency(isConsistent());
     return true;
 }
 
 long SubtitleProcessing::isConsistent() const
 {
     for (int i = 0; i < subs->getTitles().size() - 1; i++)
-        if (subs->getTitles()[i]->getEnd() > subs->getTitles()[i+1]->getStart())
+    {
+        if (subs->getTitles()[i]->getEnd() >
+                subs->getTitles()[i + 1]->getStart())
             return i;
+    }
     return -1;
 }

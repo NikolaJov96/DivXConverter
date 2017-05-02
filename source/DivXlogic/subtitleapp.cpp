@@ -50,6 +50,7 @@ void SubtitleApp::loadTitle(const QString &path,
     subs->setFormat(format);
     subs->setFPS(fps);
     subs->setEdited(false);
+    subs->setConsistency(true);
     files.push_back(subs);
 }
 

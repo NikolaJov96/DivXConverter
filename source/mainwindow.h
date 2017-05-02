@@ -95,7 +95,7 @@ private:
     TabForm *currTab = nullptr;                     /*!< Pointer to the current tab in tabWidget */
 
     void closeEvent(QCloseEvent*);                  /*!< Overrides QMainWindow method for closing the window */
-    void changeContext(int);                        /*!< Switches to the desited tab (file) */
+    void changeContext(int, bool checkCons = false);/*!< Switches to the desited tab (file) */
     void actionNew();                               /*!< Creates new Subtitles and tab */
     void actionLoad();                              /*!< Loads title form file to the new tab */
     void actionSave();                              /*!< Saves title to file */
@@ -114,6 +114,7 @@ private:
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */
     void updateWindowTitle();                       /*!< Update window title to corespond to opened file */
     void status(const QString&);                    /*!< Show message in status bar */
+    void updateConsLable();                         /*!< Updates consistency label for the current file */
 };
 
 #endif // MAINWINDOW_H

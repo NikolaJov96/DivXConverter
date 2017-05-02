@@ -1,29 +1,27 @@
 #include "subtitle.h"
 
 Subtitle::Subtitle(const QString &t, long s, long e) :
-    text(t), start(s), end(e) {}
+    text(t), start(s), end(e)
+{
+    sStart = longToTime(start);
+    sEnd = longToTime(end);
+}
 
 QString &Subtitle::getText() { return text; }
 
 QString const &Subtitle::getText() const { return text; }
 
-long &Subtitle::getStart() { return start; }
-
-long &Subtitle::getEnd() { return end; }
-
 long Subtitle::getStart() const { return start; }
 
 long Subtitle::getEnd() const { return end; }
 
-QString Subtitle::getSStart() const
-{
-    return longToTime(start);
-}
+QString const &Subtitle::getSStart() const { return sStart; }
 
-QString Subtitle::getSEnd() const
-{
-    return longToTime(end);
-}
+QString const &Subtitle::getSEnd() const { return sEnd; }
+
+void Subtitle::setStart(long s) { sStart = longToTime(start = s); }
+
+void Subtitle::setEnd(long e) { sEnd = longToTime(end = e); }
 
 bool Subtitle::operator==(const Subtitle &sub) const
 {
