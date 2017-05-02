@@ -21,7 +21,7 @@ MainWindow::MainWindow(int argc, char** argv, QMainWindow *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(QSize(842, 441));
+    this->setFixedSize(QSize(710, 490));
 
     QString message = "";
     if (argc > 1)
@@ -237,16 +237,8 @@ void MainWindow::actionSaveAs(FORMATS format)
     // Get saving format if none is provided
     if (format == FORMATS::UNDEFINED)
     {
-        if (ui->SRTRadioButton->isChecked())
-            format = FORMATS::SRT;
-        else if (ui->MPSubRadioButton->isChecked())
-            format = FORMATS::MPSub;
-        else if (ui->MicroDVDRadioButton->isChecked())
-            format = FORMATS::MicroDVD;
-        else {
-            status("Undefined format while saving the file");
-            return;
-        }
+        status("Undefined format while saving the file");
+        return;
     }
 
     // Chose file extensions
@@ -370,6 +362,7 @@ void MainWindow::actionDelete()
     status("*");
     currTab->refreshTitleList();
     updateWindowTitle();
+    currTab->updateTitle();
     status("Subtitle(s) deleted!");
 }
 
@@ -528,12 +521,12 @@ void MainWindow::actionAbout()
         case FORMATS::MPSub: format = "MPSub"; break;
         }
         QString subtitleCo = QString::number(currentFile->getTitles().size());
-        QString size = "123";
+        QString size = QString::number(currentFile->getFileSize());
         message = "Information abot \nselected file:\n\n"
                 "Duration:\t" + duration + "\n"
                 "Format:\t" + format + "\n"
                 "Subtitles:\t" + subtitleCo + "\n"
-                "Size:\t\t" + size;
+                "Size:\t\t" + size + " B";
     }
     QMessageBox msgBox;
     msgBox.setText(message);
@@ -542,30 +535,13 @@ void MainWindow::actionAbout()
 
 void MainWindow::updateWindowTitle()
 {
-    QString title = PROGRAM_TITLE + " | " +
-                currentFile->getFilePath();
-    if (currentFile->isEdited()) title += " *";
-    this->setWindowTitle(title);
+    this->setWindowTitle(PROGRAM_TITLE + " | " +
+                         currentFile->getFilePath());
 }
 
 void MainWindow::status(const QString &message)
 {
     ui->statusBar->showMessage(message);
-}
-
-void MainWindow::on_loadSubtitleButton_clicked()
-{
-    actionLoad();
-}
-
-void MainWindow::on_saveSubtitleButton_clicked()
-{
-    actionSave();
-}
-
-void MainWindow::on_saveSubtitleAsButton_clicked()
-{
-    actionSaveAs();
 }
 
 void MainWindow::on_FPSDoubleSpinBox_valueChanged(double)
@@ -579,11 +555,6 @@ void MainWindow::on_FPSDoubleSpinBox_editingFinished()
     ui->FPSlabel->setText("Current FPS:");
     currentFile->setFPS(ui->FPSDoubleSpinBox->value());
     updateWindowTitle();
-}
-
-void MainWindow::on_editButton_clicked()
-{
-    actionEdit();
 }
 
 void MainWindow::on_searchLineEdit_editingFinished()

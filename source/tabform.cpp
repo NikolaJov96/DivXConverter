@@ -69,7 +69,7 @@ void TabForm::refreshTitleList()
     {
         newModel = new QStandardItemModel(0, 3);
         QStringList horizontalLabels =
-            {"Start", "End", "Subtitle text"};
+            {"Start", "End", "Subtitle Text"};
         newModel->setHorizontalHeaderLabels(horizontalLabels);
 
         long ind = 0;
@@ -78,7 +78,7 @@ void TabForm::refreshTitleList()
         {
             // add title to table
             if (searchPhrase.length() > 0 &&
-                    !row->getText().contains(searchPhrase)) continue;
+                    !row->getText().toLower().contains(searchPhrase.toLower())) continue;
             list.clear();
             list.append(new QStandardItem(row->getSStart()));
             list.append(new QStandardItem(row->getSEnd()));
@@ -99,9 +99,9 @@ void TabForm::refreshTitleList()
     {
         ui->tableView->verticalHeader()->
                 setSectionResizeMode(QHeaderView::ResizeToContents);
-        ui->tableView->setColumnWidth(0, 75);
-        ui->tableView->setColumnWidth(1, 75);
-        ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
+        ui->tableView->resizeColumnsToContents();
+        ui->tableView->horizontalHeader()->setStretchLastSection(true);
+        //ui->tableView->setColumnWidth(2, ui->tableView->width() - 200);
         ui->tableView->horizontalHeader()->
                 setSectionResizeMode(QHeaderView::Fixed);
     }

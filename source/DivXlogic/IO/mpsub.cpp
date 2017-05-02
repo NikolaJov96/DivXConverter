@@ -64,10 +64,11 @@ void MPSub::loadTitle(Subtitles& subs, const QString &path, double fps) const
         Subtitle *newTitle = new Subtitle(data, start, end);
         subs.addSubTitle(newTitle);
     }
+    subs.setFileSize(inFile.size());
     inFile.close();
 }
 
-void MPSub::saveTitle(const Subtitles &subs, const QString &path) const
+void MPSub::saveTitle(Subtitles &subs, const QString &path) const
 {
     // convert titles from subs to MPSub format
     // remove <i> and <\i> flasgs
@@ -83,17 +84,21 @@ void MPSub::saveTitle(const Subtitles &subs, const QString &path) const
     for (auto &sub : subs.getTitles())
     {
         // leave blank space
-        if (timePoint > 0) outStream << "\n";
+        if (timePoint > 0) outStream << endl;
 
         // convert and write time
         long start = sub->getStart() - timePoint;
         long len = sub->getEnd() - sub->getStart();
         timePoint += start + len;
         outStream << QString::number(start / 1000.0, 'f', 2) << " "
-                  << QString::number(len / 1000.0, 'f', 2) << "\n";
+                  << QString::number(len / 1000.0, 'f', 2) << endl;
 
         // write title text
-        outStream << sub->getText() << "\n";
+        QString data = sub->getText();
+        while (data.contains("<i>")) data.replace("<i>", "");
+        while (data.contains("</i>")) data.replace("</i>", "");
+        outStream << data << endl;
     }
     outFile.close();
+    subs.setFileSize(getFileSize(path));
 }

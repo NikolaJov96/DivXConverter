@@ -52,3 +52,13 @@ FORMATS SubtitleIO::detect(const QString &path)
     if (re.exactMatch(line)) return FORMATS::SRT;
     return FORMATS::MPSub;
 }
+
+long long SubtitleIO::getFileSize(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        throw CantOpenFile(path);
+    long long size = file.size();
+    file.close();
+    return size;
+}

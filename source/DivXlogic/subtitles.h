@@ -24,7 +24,8 @@ public:
     double getFPS() const;                              /*!< Returns current FPS setting */
     QString const &getFilePath() const;                 /*!< Returns save path QString */
     FORMATS getFormat() const;                          /*!< Retunrs save file format */
-    long getConsistency() const;                        /*!< Check if file is consistent */
+    long getConsistency() const;                        /*!< Returns consistency flag */
+    long long getFileSize() const;                      /*!< Returns file size in bytes */
     bool isEdited() const;                              /*!< Checks if file is edited after the last save */
 
     void setFPS(double);                                /*!< Sets new FPS falue */
@@ -32,6 +33,7 @@ public:
     void setFormat(FORMATS);                            /*!< Sets new format of the save file */
     void setEdited(bool);                               /*!< Sets edited flag */
     void setConsistency(long);                          /*!< Sets consistancy flag */
+    void setFileSize(long long);                        /*!< Sets file size in bytes */
 
     long indexOf(const QString&) const;                 /*!< Returns the index of title with provided start time */
     void addSubTitle(Subtitle*);                        /*!< Inserts new subtitle (to the end by default)*/
@@ -43,6 +45,7 @@ private:
     FORMATS fileType = FORMATS::UNDEFINED;              /*!< Opened file format */
     bool edited = false;                                /*!< Flag implying file is edited after last save */
     long consistent = -1;                               /*!< Number of the title that is inconsistent */
+    long long fileSize = 0;                             /*!< File size in bytes */
 };
 
 #endif // SUBTITLES_H

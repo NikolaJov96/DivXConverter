@@ -20,7 +20,7 @@ editTitleDialog::editTitleDialog(Subtitle *sub, QWidget *parent) :
     ui->spinBox_7->setValue((end / 1000) % 60);
     ui->spinBox_8->setValue(end % 1000);
 
-    ui->textEdit->setText(subtitle->getText());
+    ui->plainTextEdit->appendPlainText(subtitle->getText());
 }
 
 editTitleDialog::~editTitleDialog()
@@ -47,7 +47,7 @@ void editTitleDialog::on_pushButton_clicked()
              ui->spinBox_7->value()) * 1000 +
             ui->spinBox_8->value());
 
-    QString text = ui->textEdit->toPlainText();
+    QString text = ui->plainTextEdit->toPlainText();
     while (text.contains("\n\n")) text.replace("\n\n", "\n");
     if (text.startsWith("\n")) text = text.mid(1, text.length() - 1);
     if (text.endsWith("\n")) text = text.mid(0, text.length() - 1);

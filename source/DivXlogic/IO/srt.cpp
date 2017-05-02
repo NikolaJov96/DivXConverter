@@ -34,7 +34,7 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
     inStream.setCodec("UTF-8");
     QString time, data, nextLine;
     long line = 0;
-    QRegExp timeMatch ("[0-9]+:[0-9]+:[0-9]+,[0-9]+ +--> +[0-9]+:[0-9]+:[0-9]+,[0-9]+");
+    QRegExp timeMatch("[0-9]+:[0-9]+:[0-9]+,[0-9]+ +--> +[0-9]+:[0-9]+:[0-9]+,[0-9]+");
     while (!inStream.atEnd())
     {
         // read one block
@@ -75,10 +75,11 @@ void SRT::loadTitle(Subtitles &subs, const QString &path, double fps) const
         Subtitle *newTitle = new Subtitle(data, start, end);
         subs.addSubTitle(newTitle);
     }
+    subs.setFileSize(inFile.size());
     inFile.close();
 }
 
-void SRT::saveTitle(const Subtitles& subs, const QString &path) const
+void SRT::saveTitle(Subtitles& subs, const QString &path) const
 {
     // convert titles from subs to SRT format
     // save it to file with path p
@@ -94,18 +95,19 @@ void SRT::saveTitle(const Subtitles& subs, const QString &path) const
     for (auto &sub : subs.getTitles())
     {
         // leave blank space
-        if (ID > 0) outStream << "\n";
+        if (ID > 0) outStream << endl;
 
         // write title ID
-        outStream << ++ID << "\n";
+        outStream << ++ID << endl;
 
         // convert and write time
         outStream << sub->getSStart()
                   << " --> "
-                  << sub->getSEnd() << "\n";
+                  << sub->getSEnd() << endl;
 
         // write title text
-        outStream << sub->getText() << "\n";
+        outStream << sub->getText() << endl;
     }
     outFile.close();
+    subs.setFileSize(getFileSize(path));
 }

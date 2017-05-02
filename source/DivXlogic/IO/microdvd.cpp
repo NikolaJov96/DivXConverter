@@ -42,15 +42,19 @@ void MicroDVD::loadTitle(Subtitles &subs, const QString &path, double fps) const
         long start = list[0].toLong() * 1000 / subs.getFPS();
         long end = list[1].toLong() * 1000 / subs.getFPS();
         QString data = row.mid(pos1).replace("|", "\n");
+        if (data.contains("{Y:i}"))
+            data = "<i>" + data.replace("{Y:i}", "") + "</i>";
+
 
         // add title to
         Subtitle *newTitle = new Subtitle(data, start, end);
         subs.addSubTitle(newTitle);
     }
+    subs.setFileSize(inFile.size());
     inFile.close();
 }
 
-void MicroDVD::saveTitle(const Subtitles &subs, const QString &path) const
+void MicroDVD::saveTitle(Subtitles &subs, const QString &path) const
 {
     // convert titles from subs to MicroDVD format
     // save it to file with path p
@@ -64,9 +68,16 @@ void MicroDVD::saveTitle(const Subtitles &subs, const QString &path) const
     for (auto &sub : subs.getTitles())
     {
         // convert and write time and data
+        QString data = sub->getText().replace("\n", "|");
+        if (data.startsWith("<i>") && data.endsWith("</i>"))
+            data = "{Y:i}" + data;
+        while (data.contains("<i>")) data.replace("<i>", "");
+        while (data.contains("</i>")) data.replace("</i>", "");
         outStream << "{" << sub->getStart() * subs.getFPS() / 1000 << "}"
                   << "{" << sub->getEnd() * subs.getFPS() / 1000 << "}"
-                  << sub->getText().replace("\n", "|") << "\n";
+                  << data << endl;
     }
     outFile.close();
+    subs.setFileSize(getFileSize(path));
+
 }

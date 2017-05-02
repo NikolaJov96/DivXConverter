@@ -69,8 +69,9 @@ class SubtitleIO
 {
 public:
     virtual void loadTitle(Subtitles&, const QString&, double) const = 0;   /*!< Loads Subtitles from file with provided path and FPS */
-    virtual void saveTitle(const Subtitles&, const QString&) const = 0;     /*!< Saves Subtitles to file with provided path */
+    virtual void saveTitle(Subtitles&, const QString&) const = 0;           /*!< Saves Subtitles to file with provided path */
     static FORMATS detect(const QString&);                                  /*!< Determines the format of the file with provided path */
+    static long long getFileSize(const QString&);                           /*!< Returns size of the file with provided path  */
 };
 
 /*!
@@ -82,7 +83,7 @@ class SRT : public SubtitleIO
 {
 public:
     void loadTitle(Subtitles&, const QString&, double) const;               /*!< Loads Subtitles from SRT file with provided path and FPS */
-    void saveTitle(const Subtitles&, const QString&) const;                 /*!< Saves Subtitles to SRT file with provided path */
+    void saveTitle(Subtitles&, const QString&) const;                       /*!< Saves Subtitles to SRT file with provided path */
 private:
     long timeToLong(const QString&) const;                                  /*!< Converts SRT timestamp format to ms */
     QString longToTime(long) const;                                         /*!< Converts ms to SRT time format */
@@ -96,8 +97,8 @@ private:
 class MicroDVD : public SubtitleIO
 {
 public:
-    void loadTitle(Subtitles&, const QString&, double) const;              /*!< Loads Subtitles from MicroDVD file with provided path and FPS */
-    void saveTitle(const Subtitles&, const QString&) const;                /*!< Saves Subtitles to MicroDVD file with provided path */
+    void loadTitle(Subtitles&, const QString&, double) const;               /*!< Loads Subtitles from MicroDVD file with provided path and FPS */
+    void saveTitle(Subtitles&, const QString&) const;                       /*!< Saves Subtitles to MicroDVD file with provided path */
 };
 
 /*!
@@ -110,7 +111,7 @@ class MPSub : public SubtitleIO
     friend class Subtitles;
 public:
     void loadTitle(Subtitles&, const QString&, double) const;               /*!< Loads Subtitles from MPSub file with provided path and FPS */
-    void saveTitle(const Subtitles&, const QString&) const;                 /*!< Saves Subtitles to MPSub file with provided path */
+    void saveTitle(Subtitles&, const QString&) const;                       /*!< Saves Subtitles to MPSub file with provided path */
 };
 
 #endif // SUBTITLEIO_H

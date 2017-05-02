@@ -35,17 +35,17 @@ public:
 
 private slots:
 
-    void on_loadSubtitleButton_clicked();           /*!< Load subtitle button clicked handler */
+    // void on_loadSubtitleButton_clicked();           /*!< Load subtitle button clicked handler */
 
-    void on_saveSubtitleButton_clicked();           /*!< Save subtitle button clicked handler */
+    // void on_saveSubtitleButton_clicked();           /*!< Save subtitle button clicked handler */
 
-    void on_saveSubtitleAsButton_clicked();         /*!< Save subtitle as button clicked handler */
+    // void on_saveSubtitleAsButton_clicked();         /*!< Save subtitle as button clicked handler */
 
     void on_FPSDoubleSpinBox_valueChanged(double);  /*!< FPS spin box value changed handler */
 
     void on_FPSDoubleSpinBox_editingFinished();     /*!< FPS spin box editing finished handler */
 
-    void on_editButton_clicked();                   /*!< Subtitle edit button clicked handler */
+    // void on_editButton_clicked();                   /*!< Subtitle edit button clicked handler */
 
     void on_searchLineEdit_editingFinished();       /*!< Refresh subtitle table on serch phrase edited */
 
