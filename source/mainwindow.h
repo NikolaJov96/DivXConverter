@@ -35,17 +35,9 @@ public:
 
 private slots:
 
-    // void on_loadSubtitleButton_clicked();           /*!< Load subtitle button clicked handler */
-
-    // void on_saveSubtitleButton_clicked();           /*!< Save subtitle button clicked handler */
-
-    // void on_saveSubtitleAsButton_clicked();         /*!< Save subtitle as button clicked handler */
-
     void on_FPSDoubleSpinBox_valueChanged(double);  /*!< FPS spin box value changed handler */
 
     void on_FPSDoubleSpinBox_editingFinished();     /*!< FPS spin box editing finished handler */
-
-    // void on_editButton_clicked();                   /*!< Subtitle edit button clicked handler */
 
     void on_searchLineEdit_editingFinished();       /*!< Refresh subtitle table on serch phrase edited */
 
@@ -83,7 +75,9 @@ private slots:
 
     void on_actionConcat_Files_triggered();         /*!< Concat Files menu item clicked handler */
 
-    void on_actionAbout_File_triggered();
+    void on_actionAbout_File_triggered();           /*!< Shows basic information about opened file */
+
+    void on_actionSplit_File_triggered();           /*!< Splits selected file into more new files */
 
 private:
     Ui::MainWindow *ui;                             /*!< User interface interface */
@@ -109,6 +103,7 @@ private:
     void actionAutoConcat();                        /*!< Concats suitable titles */
     void actionAutoSplit();                         /*!< Splits suitable titles */
     void actionConcatFiles();                       /*!< Concats all opened files to the new one */
+    void actionSplitFile();                         /*!< Splits selected file to the N new files */
     void actionAbout();                             /*!< Displays information about opened file */
     int discardChangesDialog() const;               /*!< Show and return result of "Discard changes dialog" */
     void refreshTitleList();                        /*!< Refresh table view after changes to subtitle vector */

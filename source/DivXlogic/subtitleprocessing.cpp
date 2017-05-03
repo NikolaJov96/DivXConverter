@@ -192,6 +192,19 @@ bool SubtitleProcessing::appendFile(const Subtitles &append)
     return true;
 }
 
+bool SubtitleProcessing::takeTitles(Subtitles *base, long start, long len)
+{
+    long long delta = base->getTitles()[start]->getStart();
+    for (int i = start; i < start + len && i < base->getTitles().size(); i++)
+    {
+        subs->addSubTitle(new Subtitle(
+                              base->getTitles()[i]->getText(),
+                              base->getTitles()[i]->getStart() - delta,
+                              base->getTitles()[i]->getEnd() - delta));
+    }
+    return true;
+}
+
 long SubtitleProcessing::isConsistent() const
 {
     for (int i = 0; i < subs->getTitles().size() - 1; i++)

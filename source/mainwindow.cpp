@@ -14,6 +14,7 @@ const int DEFAULT_MAX_LENGTH = 50;
 #include "edittitledialog.h"
 #include "timeshiftdialog.h"
 #include "autoadjustdialog.h"
+#include "splitfiledialog.h"
 #include "tabform.h"
 
 MainWindow::MainWindow(int argc, char** argv, QMainWindow *parent) :
@@ -317,7 +318,11 @@ void MainWindow::actionClose()
         {
         case QMessageBox::Save:
             if (currentFile->getFilePath().length() > 0) actionSave();
-            else actionSaveAs();
+            else
+            {
+                status("Save file initialy with Save As!");
+                return;
+            }
             break;
         case QMessageBox::Cancel: return; break;
         }
@@ -506,6 +511,51 @@ void MainWindow::actionConcatFiles()
     status("Files concatenated!");
 }
 
+void MainWindow::actionSplitFile()
+{
+    if (currentFile->getTitles().size() == 0)
+    {
+        status("Can't split empty file.");
+        return;
+    }
+
+    int co = 0;
+    SplitFileDialog dialog(co, this);
+    dialog.setModal(true);
+    dialog.exec();
+
+    if (co == -1) return;
+    if (currentFile->getTitles().size() < co)
+    {
+        status("More files then subtitles.");
+        return;
+    }
+
+    status("*");
+    Subtitles *base = currentFile;
+    int baseFileInd = currFileInd;
+    long patchLen = currentFile->getTitles().size() / co;
+    for (int i = 0; i < co - 1; i++)
+    {
+        actionNew(); // Changes context to itself
+        processor->takeTitles(base, patchLen * i, patchLen);
+        currTab->refreshTitleList();
+        updateWindowTitle();
+        currTab->updateTitle();
+        updateConsLable();
+    }
+    actionNew(); // Changes context to itself
+    processor->takeTitles(base, patchLen * (co - 1),
+                          base->getTitles().size() - (co - 1) * patchLen);
+    currTab->refreshTitleList();
+    updateWindowTitle();
+    currTab->updateTitle();
+    updateConsLable();
+
+    changeContext(baseFileInd);
+    status("File splited!");
+}
+
 void MainWindow::actionAbout()
 {
     QString message = "";
@@ -656,6 +706,11 @@ void MainWindow::on_actionConcat_Files_triggered()
 void MainWindow::on_actionAbout_File_triggered()
 {
     actionAbout();
+}
+
+void MainWindow::on_actionSplit_File_triggered()
+{
+    actionSplitFile();
 }
 
 void MainWindow::updateConsLable()

@@ -162,7 +162,7 @@
      <x>0</x>
      <y>0</y>
      <width>710</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="defaultUp">
@@ -219,6 +219,7 @@
     <addaction name="actionAuto_Concat"/>
     <addaction name="actionAuto_Devide"/>
     <addaction name="actionConcat_Files"/>
+    <addaction name="actionSplit_File"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -329,6 +330,11 @@
   <action name="actionAbout_File">
    <property name="text">
     <string>About File</string>
+   </property>
+  </action>
+  <action name="actionSplit_File">
+   <property name="text">
+    <string>Split File</string>
    </property>
   </action>
  </widget>

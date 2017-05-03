@@ -37,7 +37,8 @@ SOURCES += \
     mainwindow.cpp \
     tabform.cpp \
     timeshiftdialog.cpp \
-    DivXlogic/subtitleprocessing.cpp
+    DivXlogic/subtitleprocessing.cpp \
+    splitfiledialog.cpp
 
 HEADERS  += \
     DivXlogic/subtitle.h \
@@ -49,10 +50,12 @@ HEADERS  += \
     mainwindow.h \
     tabform.h \
     timeshiftdialog.h \
-    DivXlogic/subtitles.h
+    DivXlogic/subtitles.h \
+    splitfiledialog.h
 FORMS    += \
     autoadjustdialog.ui \
     edittitledialog.ui \
     mainwindow.ui \
     tabform.ui \
-    timeshiftdialog.ui
+    timeshiftdialog.ui \
+    splitfiledialog.ui
