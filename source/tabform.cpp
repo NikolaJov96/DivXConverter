@@ -78,7 +78,7 @@ void TabForm::refreshTitleList()
         {
             // add title to table
             if (searchPhrase.length() > 0 &&
-                    !row->getText().toLower().contains(searchPhrase.toLower())) continue;
+                    !row->getText().toUpper().contains(searchPhrase.toUpper())) continue;
             list.clear();
             list.append(new QStandardItem(row->getSStart()));
             list.append(new QStandardItem(row->getSEnd()));
@@ -133,4 +133,5 @@ void TabForm::on_tableView_doubleClicked(const QModelIndex&)
         mainWindow->updateConsLable();
         mainWindow->status("Modification applied!");
     }
+    else mainWindow->status("Title is not modified!");
 }

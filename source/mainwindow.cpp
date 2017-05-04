@@ -22,7 +22,6 @@ MainWindow::MainWindow(int argc, char** argv, QMainWindow *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(QSize(710, 490));
 
     QString message = "";
     if (argc > 1)
@@ -296,6 +295,7 @@ void MainWindow::actionEdit()
         updateConsLable();
         status("Modification applied!");
     }
+    else status("Title is not modified!");
 }
 
 void MainWindow::actionAddSubtitle()
@@ -534,7 +534,7 @@ void MainWindow::actionSplitFile()
     status("*");
     Subtitles *base = currentFile;
     int baseFileInd = currFileInd;
-    long patchLen = currentFile->getTitles().size() / co;
+    long patchLen = (long)currentFile->getTitles().size() / co;
     for (int i = 0; i < co - 1; i++)
     {
         actionNew(); // Changes context to itself
@@ -546,7 +546,7 @@ void MainWindow::actionSplitFile()
     }
     actionNew(); // Changes context to itself
     processor->takeTitles(base, patchLen * (co - 1),
-                          base->getTitles().size() - (co - 1) * patchLen);
+                          (long)base->getTitles().size() - (co - 1) * patchLen);
     currTab->refreshTitleList();
     updateWindowTitle();
     currTab->updateTitle();
